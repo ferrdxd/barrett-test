@@ -18,4 +18,4 @@ Jika Anda sudah siap untuk menulis kode, ikuti langkah-langkah berikut untuk men
 
 1. **Fork repositori ini** (jika Anda dari luar tim) atau langsung *clone* ke mesin lokal Anda:
    ```bash
-   git clone [https://github.com/username-github-anda/barrett-test.git](https://github.com/username-github-anda/barrett-test.git)
+   git clone [https://github.com/FerrDxD/barrett-test.git](https://github.com/FerrDxD/barrett-test.git)
