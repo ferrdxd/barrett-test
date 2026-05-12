@@ -18,7 +18,7 @@ Kami sangat menyarankan pengguna untuk selalu menggunakan versi terbaru yang ter
 Kami menjaga keamanan data dan aplikasi kami dengan sangat serius. Jika Anda menemukan kerentanan keamanan, harap ikuti langkah-langkah berikut:
 
 1. **Jangan membuat Issue publik**: Harap jangan melaporkan masalah keamanan melalui GitHub Issue yang bersifat terbuka.
-2. **Kirim Email**: Laporkan temuan Anda secara privat melalui email ke: `admin@example.com` (Ganti dengan email admin Anda).
+2. **Kirim Email**: Laporkan temuan Anda secara privat melalui email ke: `ferdi@nawasena.site`.
 3. **Detail Laporan**: Sertakan deskripsi lengkap mengenai kerentanan, langkah-langkah untuk mereproduksi masalah, dan potensi dampaknya.
 
 ### Apa yang Akan Kami Lakukan:
