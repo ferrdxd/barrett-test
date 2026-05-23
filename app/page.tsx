@@ -51,7 +51,7 @@ export default function LandingPage() {
         </div>
 
         {/* FUN INFO GRID CARDS */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
           <div className="p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-2xl text-center group hover:bg-indigo-50 transition-colors shadow-sm">
             <div className="text-lg mb-1">🧠</div>
             <h4 className="text-[10px] font-black text-indigo-700 uppercase tracking-wide">Kenali Diri</h4>
@@ -104,7 +104,7 @@ export default function LandingPage() {
             type="submit"
             className="w-full group bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white font-black py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 hover:-translate-y-0.5 active:scale-[0.98] mt-2 cursor-pointer"
           >
-            Mulai Petualangan Karakter 🌈
+            Mulai Petualangan Karakter 
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>

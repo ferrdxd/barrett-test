@@ -14,7 +14,7 @@ import {
   AlertTriangle, BookOpenCheck, BarChart3, HelpCircle, Zap, ShieldCheck,
   TrendingUp, Users, Award, Calendar, ChevronRight, SlidersHorizontal,
   RefreshCw, ArrowLeftRight, FileSpreadsheet, Info, CheckCircle2,
-  XCircle, Lightbulb, HelpCircle as HelpIcon, ArrowUpDown
+  XCircle, Lightbulb, HelpCircle as HelpIcon, ArrowUpDown, Menu
 } from "lucide-react";
 
 interface Candidate {
@@ -54,7 +54,7 @@ const getCategoryScore = (selectedWordIds: string[], category: string) => {
   return (count / 10) * 100;
 };
 
-// Premium Gauge component (Light Mode Style)
+// Premium Gauge component
 const PremiumGauge = ({ score }: { score: number }) => {
   const rotation = 180 + (score / 100) * 180;
   
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Navigation & UI Tabs
+  // Navigation Tabs
   const [activeTab, setActiveTab] = useState<"overview" | "report" | "compare" | "guide">("overview");
 
   // Sidebar sorting and filtering states
@@ -108,7 +108,10 @@ export default function AdminDashboard() {
   const [compareA, setCompareA] = useState<string>("");
   const [compareB, setCompareB] = useState<string>("");
 
-  // Interactive Hourglass Matrix hovered/selected level details
+  // Mobile sidebar drawer state
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Interactive Hourglass Matrix level state
   const [activeHourglassLvl, setActiveHourglassLvl] = useState<number | null>(null);
 
   useEffect(() => {
@@ -421,7 +424,7 @@ export default function AdminDashboard() {
       },
       "Waswas": {
         q: "Bagaimana Anda memastikan kepastian atas kesiapan setiap pos kepanitiaan sehingga tidak diliputi rasa khawatir/was-was saat acara berlangsung?",
-        lf: "Penerapan sistem checklist kontrol ketat and kebiasaan melakukan koordinasi berkala.",
+        lf: "Penerapan sistem checklist kontrol ketat dan kebiasaan melakukan koordinasi berkala.",
         cat: "Kecemasan"
       },
       "Pesimis": {
@@ -486,212 +489,249 @@ export default function AdminDashboard() {
   const handleSelectCandidate = (candidate: Candidate) => {
     setSelectedCandidate(candidate);
     setActiveTab("report");
+    setIsMobileSidebarOpen(false); // Close mobile drawer when a candidate is chosen
   };
 
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col md:flex-row gap-6 font-sans">
-      
-      {/* ============================================================
-          BILAH SAMPING / SIDEBAR (Premium Light Mode)
-          ============================================================ */}
-      <div className="w-full md:w-[380px] bg-white border-r border-slate-200 flex flex-col h-screen md:sticky top-0 flex-shrink-0 z-30 shadow-sm">
-        
-        {/* Header Sidebar */}
-        <div className="p-6 border-b border-slate-100 space-y-4 bg-white">
+  // Reusable Sidebar Content to avoid duplication between Desktop and Mobile drawer
+  const renderSidebarContent = () => (
+    <div className="flex flex-col h-full bg-white text-slate-800">
+      {/* Header Sidebar */}
+      <div className="p-6 border-b border-slate-100 space-y-4 bg-white shrink-0">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/10">
               <BrainCircuit className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="font-extrabold text-slate-900 text-lg tracking-tight flex items-center gap-1.5">
-                NAVASENA <span className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">PRO</span>
+              <h2 className="font-extrabold text-slate-900 text-base tracking-tight flex items-center gap-1.5">
+                NAVASENA <span className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 bg-indigo-55 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">PRO</span>
               </h2>
               <p className="text-slate-500 text-xs font-semibold">Analisis Psikometri OSIS</p>
             </div>
           </div>
+          
+          {/* Close button for mobile drawer */}
+          <button 
+            onClick={() => setIsMobileSidebarOpen(false)}
+            className="md:hidden p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            <XCircle className="w-5 h-5" />
+          </button>
+        </div>
 
-          {/* Kolom Pencarian */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Cari nama atau kelas..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all placeholder:text-slate-400 font-medium text-slate-800"
-            />
+        {/* Kolom Pencarian */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input 
+            type="text" 
+            placeholder="Cari nama atau kelas..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all placeholder:text-slate-400 font-medium text-slate-800"
+          />
+        </div>
+
+        {/* Panel Akordion Filter */}
+        <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/80 space-y-2">
+          <div className="flex items-center justify-between text-[10px] font-black text-slate-500">
+            <span className="flex items-center gap-1.5"><SlidersHorizontal className="w-3.5 h-3.5 text-indigo-500" /> KONTROL</span>
+            <button 
+              onClick={() => { setFilterClass("all"); setFilterEntropy("all"); setSortBy("newest"); setSearchQuery(""); }} 
+              className="text-[9px] text-slate-400 hover:text-indigo-600 transition-colors uppercase font-black"
+            >
+              Reset
+            </button>
           </div>
-
-          {/* Panel Akordion Filter */}
-          <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/80 space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <span className="flex items-center gap-1.5"><SlidersHorizontal className="w-3.5 h-3.5 text-indigo-500" /> KONTROL</span>
-              <button 
-                onClick={() => { setFilterClass("all"); setFilterEntropy("all"); setSortBy("newest"); setSearchQuery(""); }} 
-                className="text-[10px] text-slate-400 hover:text-indigo-600 transition-colors uppercase font-black"
-              >
-                Reset
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {/* Filter Kelas */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Kelas</label>
-                <select
-                  value={filterClass}
-                  onChange={(e) => setFilterClass(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg text-xs p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="all">Semua Kelas</option>
-                  {classesList.map(cls => <option key={cls} value={cls}>{cls}</option>)}
-                </select>
-              </div>
-              {/* Filter Status Entropi */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Entropi</label>
-                <select
-                  value={filterEntropy}
-                  onChange={(e) => setFilterEntropy(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg text-xs p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="Healthy">Sehat (Healthy)</option>
-                  <option value="Focus">Perlu Fokus</option>
-                  <option value="Significant">Signifikan</option>
-                  <option value="Critical">Kritis (Critical)</option>
-                </select>
-              </div>
-            </div>
-            {/* Urutan */}
-            <div className="flex flex-col gap-1 mt-1 border-t border-slate-200/60 pt-1.5">
-              <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Urutkan</label>
+          <div className="grid grid-cols-2 gap-2 mt-1">
+            {/* Filter Kelas */}
+            <div className="flex flex-col gap-0.5">
+              <label className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Kelas</label>
               <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-white border border-slate-200 rounded-lg text-xs p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
+                value={filterClass}
+                onChange={(e) => setFilterClass(e.target.value)}
+                className="bg-white border border-slate-200 rounded-lg text-[10px] p-1 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
               >
-                <option value="newest">Terbaru Masuk</option>
-                <option value="name">Nama A - Z</option>
-                <option value="health_desc">Kesiapan Tertinggi</option>
-                <option value="entropy_asc">Hambatan Terkecil</option>
+                <option value="all">Semua</option>
+                {classesList.map(cls => <option key={cls} value={cls}>{cls}</option>)}
+              </select>
+            </div>
+            {/* Filter Status Entropi */}
+            <div className="flex flex-col gap-0.5">
+              <label className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Entropi</label>
+              <select
+                value={filterEntropy}
+                onChange={(e) => setFilterEntropy(e.target.value)}
+                className="bg-white border border-slate-200 rounded-lg text-[10px] p-1 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
+              >
+                <option value="all">Semua</option>
+                <option value="Healthy">Sehat</option>
+                <option value="Focus">Fokus</option>
+                <option value="Significant">Signifikan</option>
+                <option value="Critical">Kritis</option>
               </select>
             </div>
           </div>
-
-          <div className="flex justify-between items-center text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-            <span>Daftar Kandidat ({filteredCandidates.length})</span>
-            {activeTab !== "overview" && (
-              <button 
-                onClick={() => setActiveTab("overview")} 
-                className="text-indigo-600 hover:text-indigo-500 flex items-center gap-1 font-black transition-colors"
-              >
-                <BarChart3 className="w-3 h-3" /> STATS GRUP
-              </button>
-            )}
+          {/* Urutan */}
+          <div className="flex flex-col gap-0.5 mt-1 border-t border-slate-200/60 pt-1.5">
+            <label className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Urutkan</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="bg-white border border-slate-200 rounded-lg text-[10px] p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
+            >
+              <option value="newest">Terbaru</option>
+              <option value="name">Nama A-Z</option>
+              <option value="health_desc">Kesiapan</option>
+              <option value="entropy_asc">Hambatan</option>
+            </select>
           </div>
         </div>
-        
-        {/* Daftar Kandidat */}
-        <div className="overflow-y-auto flex-1 p-3 space-y-2 custom-scrollbar bg-slate-50/50">
-          {filteredCandidates.length === 0 ? (
-            <div className="text-center py-10 text-slate-400 text-xs font-semibold">
-              Tidak ada kandidat cocok filter
-            </div>
-          ) : (
-            filteredCandidates.map(c => {
-              const isSelected = selectedCandidate?.id === c.id;
-              
-              // Determine Entropy indicator color
-              const entropy = c.analysis.entropyScore;
-              let statusColor = "bg-emerald-500 ring-emerald-500/20";
-              if (entropy >= 29) {
-                statusColor = "bg-rose-500 ring-rose-500/20";
-              } else if (entropy >= 20) {
-                statusColor = "bg-amber-500 ring-amber-500/20";
-              } else if (entropy >= 14) {
-                statusColor = "bg-yellow-400 ring-yellow-400/20";
-              }
 
-              return (
-                <button
-                  key={c.id} 
-                  onClick={() => handleSelectCandidate(c)}
-                  className={`w-full text-left p-4 rounded-xl flex items-center justify-between group transition-all duration-300 relative border overflow-hidden ${
-                    isSelected 
-                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 border-indigo-600 text-white shadow-md shadow-indigo-600/10 scale-[1.01]' 
-                      : 'bg-white hover:bg-slate-50 border-slate-200/70 shadow-[0_2px_4px_rgba(0,0,0,0.01)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative shrink-0 ${
-                      isSelected 
-                        ? 'bg-white/20 text-white' 
-                        : 'bg-slate-100 border border-slate-200 text-slate-500 group-hover:text-indigo-600 group-hover:bg-indigo-50'
-                    }`}>
-                      <User className="w-5 h-5" />
-                      {/* Entropy Dot */}
-                      <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ring-4 ${statusColor}`}></span>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <p className={`font-bold text-sm tracking-tight transition-colors truncate max-w-[150px] ${
-                          isSelected ? 'text-white' : 'text-slate-800 group-hover:text-indigo-600'
-                        }`}>
-                          {c.name}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] font-black ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>{c.student_class}</span>
-                        <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
-                          isSelected ? 'bg-indigo-500/20 text-white border-indigo-400/20' : 'bg-slate-50 text-slate-500 border-slate-200/80'
-                        }`}>
-                          Ready: {c.analysis.healthScore}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-1.5 relative z-10 shrink-0">
-                    {isSelected ? (
-                      <Sparkles className="w-4 h-4 text-white animate-pulse" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
-                    )}
-                  </div>
-                </button>
-              );
-            })
+        <div className="flex justify-between items-center text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">
+          <span>Daftar Kandidat ({filteredCandidates.length})</span>
+          {activeTab !== "overview" && (
+            <button 
+              onClick={() => { setActiveTab("overview"); setIsMobileSidebarOpen(false); }} 
+              className="text-indigo-600 hover:text-indigo-500 flex items-center gap-1 font-black transition-colors"
+            >
+              <BarChart3 className="w-3 h-3" /> STATS GRUP
+            </button>
           )}
         </div>
       </div>
+      
+      {/* Daftar Kandidat List */}
+      <div className="overflow-y-auto flex-1 p-3 space-y-2 custom-scrollbar bg-slate-50/50">
+        {filteredCandidates.length === 0 ? (
+          <div className="text-center py-10 text-slate-400 text-xs font-semibold">
+            Tidak ada kandidat cocok filter
+          </div>
+        ) : (
+          filteredCandidates.map(c => {
+            const isSelected = selectedCandidate?.id === c.id;
+            const entropy = c.analysis.entropyScore;
+            let statusColor = "bg-emerald-500 ring-emerald-500/20";
+            if (entropy >= 29) statusColor = "bg-rose-500 ring-rose-500/20";
+            else if (entropy >= 20) statusColor = "bg-amber-500 ring-amber-500/20";
+            else if (entropy >= 14) statusColor = "bg-yellow-400 ring-yellow-400/20";
+
+            return (
+              <button
+                key={c.id} 
+                onClick={() => handleSelectCandidate(c)}
+                className={`w-full text-left p-4 rounded-xl flex items-center justify-between group transition-all duration-300 relative border overflow-hidden ${
+                  isSelected 
+                    ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 border-indigo-600 text-white shadow-md shadow-indigo-600/10 scale-[1.01]' 
+                    : 'bg-white hover:bg-slate-50 border-slate-200/70 shadow-[0_2px_4px_rgba(0,0,0,0.005)]'
+                }`}
+              >
+                <div className="flex items-center gap-3 relative z-10">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative shrink-0 ${
+                    isSelected 
+                      ? 'bg-white/20 text-white' 
+                      : 'bg-slate-100 border border-slate-200 text-slate-500 group-hover:text-indigo-600 group-hover:bg-indigo-50'
+                  }`}>
+                    <User className="w-5 h-5" />
+                    <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ring-4 ${statusColor}`}></span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <p className={`font-bold text-sm tracking-tight transition-colors truncate max-w-[130px] ${
+                        isSelected ? 'text-white' : 'text-slate-800 group-hover:text-indigo-600'
+                      }`}>
+                        {c.name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className={`text-[10px] font-black ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>{c.student_class}</span>
+                      <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
+                        isSelected ? 'bg-indigo-500/20 text-white border-indigo-400/20' : 'bg-slate-50 text-slate-500 border-slate-200/80'
+                      }`}>
+                        Ready: {c.analysis.healthScore}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-1.5 relative z-10 shrink-0">
+                  {isSelected ? (
+                    <Sparkles className="w-4 h-4 text-white animate-pulse" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
+                  )}
+                </div>
+              </button>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col md:flex-row gap-6 font-sans">
+      
+      {/* ============================================================
+          DESKTOP SIDEBAR (Visible only on md screens and up)
+          ============================================================ */}
+      <div className="hidden md:flex w-[380px] border-r border-slate-200 flex-col h-screen sticky top-0 flex-shrink-0 z-30 shadow-sm bg-white">
+        {renderSidebarContent()}
+      </div>
 
       {/* ============================================================
-          KONTEN UTAMA (Light Mode Dashboard)
+          MOBILE DRAWER SIDEBAR (Triggered by hamburger button)
+          ============================================================ */}
+      {isMobileSidebarOpen && (
+        <>
+          {/* Overlay background */}
+          <div 
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-300"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          {/* Drawer Sidebar */}
+          <div className="fixed inset-y-0 left-0 w-[300px] sm:w-[340px] bg-white z-50 flex flex-col h-full shadow-2xl md:hidden animate-in slide-in-from-left duration-300">
+            {renderSidebarContent()}
+          </div>
+        </>
+      )}
+
+      {/* ============================================================
+          MAIN BODY LAYOUT
           ============================================================ */}
       <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
         
-        {/* Top Navbar */}
-        <div className="bg-white/80 border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 backdrop-blur-md z-20 shadow-sm">
-          <div>
-            <h1 className="text-xl font-black bg-gradient-to-r from-slate-950 via-slate-800 to-indigo-700 bg-clip-text text-transparent">
-              {activeTab === "overview" && "Dashboard Analisis Komparatif OSIS"}
-              {activeTab === "report" && `Laporan Profil Psikologis: ${activeCandidate?.name || ""}`}
-              {activeTab === "compare" && "Kamera Komparasi Kandidat"}
-              {activeTab === "guide" && "Panduan Interpretasi Barrett Model"}
-            </h1>
-            <p className="text-slate-500 text-xs font-semibold mt-0.5">
-              {activeTab === "overview" && "Hasil Pengukuran Karakteristik Kolektif & Tren Pendaftaran"}
-              {activeTab === "report" && `Detail Profil Barrett 7 Tingkat Kesadaran Kelas ${activeCandidate?.student_class || ""}`}
-              {activeTab === "compare" && "Bandingkan Nilai Karakteristik Dua Kandidat Berdampingan"}
-              {activeTab === "guide" && "Bagaimana Memahami Level 1 - 7 untuk Perekrutan Pengurus OSIS"}
-            </p>
+        {/* Top Sticky Navbar */}
+        <div className="bg-white/80 border-b border-slate-200 px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 backdrop-blur-md z-20 shadow-sm">
+          <div className="flex items-center gap-3">
+            {/* Mobile Drawer Trigger Button */}
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="md:hidden p-2 hover:bg-slate-100 rounded-xl border border-slate-200 text-slate-600 hover:text-indigo-600 transition-colors shadow-sm bg-white flex items-center justify-center shrink-0 cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            
+            <div>
+              <h1 className="text-lg md:text-xl font-black bg-gradient-to-r from-slate-950 via-slate-800 to-indigo-700 bg-clip-text text-transparent">
+                {activeTab === "overview" && "Dashboard Analisis Komparatif OSIS"}
+                {activeTab === "report" && `Laporan Profil Psikologis: ${activeCandidate?.name || ""}`}
+                {activeTab === "compare" && "Kamera Komparasi Kandidat"}
+                {activeTab === "guide" && "Panduan Interpretasi Barrett Model"}
+              </h1>
+              <p className="text-slate-500 text-[10px] md:text-xs font-semibold mt-0.5">
+                {activeTab === "overview" && "Hasil Pengukuran Karakteristik Kolektif & Tren Pendaftaran"}
+                {activeTab === "report" && `Detail Profil Barrett 7 Tingkat Kesadaran Kelas ${activeCandidate?.student_class || ""}`}
+                {activeTab === "compare" && "Bandingkan Nilai Karakteristik Dua Kandidat Berdampingan"}
+                {activeTab === "guide" && "Bagaimana Memahami Level 1 - 7 untuk Perekrutan Pengurus OSIS"}
+              </p>
+            </div>
           </div>
 
-          {/* Tab Button Menu */}
-          <div className="flex bg-slate-100 border border-slate-200 p-1 rounded-xl text-xs font-bold gap-1 self-start sm:self-center">
+          {/* Tab Navigation Menu */}
+          <div className="flex bg-slate-100 border border-slate-200 p-1 rounded-xl text-[11px] font-bold gap-0.5 self-start sm:self-center overflow-x-auto max-w-full no-scrollbar">
             <button 
               onClick={() => setActiveTab("overview")}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 shrink-0 transition-all ${
                 activeTab === "overview" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -700,7 +740,7 @@ export default function AdminDashboard() {
             <button 
               onClick={() => activeCandidate && setActiveTab("report")}
               disabled={!activeCandidate}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 shrink-0 transition-all ${
                 !activeCandidate ? "opacity-40 cursor-not-allowed" : ""
               } ${activeTab === "report" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
             >
@@ -708,7 +748,7 @@ export default function AdminDashboard() {
             </button>
             <button 
               onClick={() => setActiveTab("compare")}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 shrink-0 transition-all ${
                 activeTab === "compare" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -716,7 +756,7 @@ export default function AdminDashboard() {
             </button>
             <button 
               onClick={() => setActiveTab("guide")}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1 shrink-0 transition-all ${
                 activeTab === "guide" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -725,64 +765,64 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tab Content Wrapper */}
-        <div className="p-6 flex-1">
+        {/* Tab Contents */}
+        <div className="p-4 md:p-6 flex-1">
           
           {/* ============================================================
-              TAB 1: OVERVIEW & KOLEKTIF ANALYTICS (Light Mode)
+              TAB 1: OVERVIEW & KOLEKTIF ANALYTICS
               ============================================================ */}
           {activeTab === "overview" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10">
               
-              {/* KPI STATS ROW */}
+              {/* KPI STATS ROW (Fully responsive grid layout) */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 {/* 1. Total Pelamar */}
                 <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-indigo-600 group-hover:scale-105 transition-transform shrink-0">
-                    <Users className="w-5 h-5" />
+                  <div className="absolute right-3 top-3 p-2 bg-slate-50 border border-slate-100 rounded-xl text-indigo-600 group-hover:scale-105 transition-transform shrink-0">
+                    <Users className="w-4 h-4" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Pelamar OSIS</p>
-                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.total}</h3>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-emerald-600 font-bold">
-                    <TrendingUp className="w-3.5 h-3.5" /> +100% data aktif
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Pelamar</p>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">{globalStats.total}</h3>
+                  <div className="flex items-center gap-1 mt-1 text-[9px] text-emerald-600 font-bold">
+                    <TrendingUp className="w-3 h-3" /> +100% data aktif
                   </div>
                 </div>
 
                 {/* 2. Rerata Mental Kesiapan */}
                 <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-emerald-600 group-hover:scale-105 transition-transform shrink-0">
-                    <Activity className="w-5 h-5" />
+                  <div className="absolute right-3 top-3 p-2 bg-slate-50 border border-slate-100 rounded-xl text-emerald-600 group-hover:scale-105 transition-transform shrink-0">
+                    <Activity className="w-4 h-4" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Kesiapan Mental</p>
-                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.avgHealth} <span className="text-xs font-bold text-slate-400">/ 100</span></h3>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span className="text-[10px] text-emerald-600 font-extrabold uppercase">Sangat Siap</span>
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Kesiapan Mental</p>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">{globalStats.avgHealth} <span className="text-xs font-bold text-slate-400">/100</span></h3>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span className="text-[9px] text-emerald-600 font-black uppercase">Sangat Siap</span>
                   </div>
                 </div>
 
                 {/* 3. Rerata Entropi Budaya */}
                 <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-rose-500 group-hover:scale-105 transition-transform shrink-0">
-                    <AlertTriangle className="w-5 h-5" />
+                  <div className="absolute right-3 top-3 p-2 bg-slate-50 border border-slate-100 rounded-xl text-rose-500 group-hover:scale-105 transition-transform shrink-0">
+                    <AlertTriangle className="w-4 h-4" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Hambatan (Entropi)</p>
-                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.avgEntropy}%</h3>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-500 font-semibold">
-                    Rentang keraguan internal kolektif
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Hambatan (Entropi)</p>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">{globalStats.avgEntropy}%</h3>
+                  <div className="flex items-center gap-1 mt-1 text-[9px] text-slate-500 font-semibold">
+                    Rentang beban mental
                   </div>
                 </div>
 
                 {/* 4. Rerata Alignment OSIS */}
                 <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-amber-500 group-hover:scale-105 transition-transform shrink-0">
-                    <Award className="w-5 h-5" />
+                  <div className="absolute right-3 top-3 p-2 bg-slate-50 border border-slate-100 rounded-xl text-amber-500 group-hover:scale-105 transition-transform shrink-0">
+                    <Award className="w-4 h-4" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kesesuaian Karakter</p>
-                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.avgAlignment} <span className="text-xs font-bold text-slate-400">/ 10</span></h3>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-amber-500 font-bold">
-                    Kecocokan terhadap kultur OSIS
+                  <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Kesesuaian</p>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">{globalStats.avgAlignment} <span className="text-xs font-bold text-slate-400">/10</span></h3>
+                  <div className="flex items-center gap-1 mt-1 text-[9px] text-amber-500 font-bold">
+                    Kecocokan kultur
                   </div>
                 </div>
 
@@ -792,10 +832,10 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* 1. Tren Pendaftaran */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Tren Pendaftaran Kandidat</h3>
-                    <p className="text-[11px] text-slate-500 mb-6">Frekuensi penambahan data baru di setiap harinya.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Tren Pendaftaran Kandidat</h3>
+                    <p className="text-[10px] md:text-[11px] text-slate-500 mb-6">Frekuensi penambahan data baru di setiap harinya.</p>
                   </div>
                   <div className="w-full h-[220px]">
                     {globalStats.registrationTrend.length === 0 ? (
@@ -821,10 +861,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 2. Distribusi Hambatan (Entropy Donut) */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-4 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Distribusi Entropi Kelompok</h3>
-                    <p className="text-[11px] text-slate-500 mb-4">Pengelompokan tingkat beban kecemasan kandidat.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Distribusi Entropi Kelompok</h3>
+                    <p className="text-[10px] md:text-[11px] text-slate-500 mb-4">Pengelompokan tingkat beban kecemasan kandidat.</p>
                   </div>
                   <div className="w-full h-[180px] relative">
                     {globalStats.entropyGroups.length === 0 ? (
@@ -850,7 +890,7 @@ export default function AdminDashboard() {
                       </ResponsiveContainer>
                     )}
                   </div>
-                  <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-[9px] font-black text-slate-500 mt-2 border-t border-slate-100 pt-3">
+                  <div className="flex flex-wrap justify-center gap-x-2.5 gap-y-1.5 text-[9px] font-black text-slate-500 mt-2 border-t border-slate-100 pt-3">
                     <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-500"></span> Healthy</span>
                     <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-yellow-400"></span> Focus</span>
                     <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-500"></span> Significant</span>
@@ -864,10 +904,10 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 {/* 1. Barrett Levels Average (Collective Conscious) */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-4 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Profil Nilai Kolektif (Barrett 7 Levels)</h3>
-                    <p className="text-[11px] text-slate-500 mb-6">Rata-rata tingkat kesadaran kolektif dari seluruh pendaftar OSIS.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Profil Nilai Kolektif (Barrett 7 Levels)</h3>
+                    <p className="text-[10px] md:text-[11px] text-slate-500 mb-6">Rata-rata tingkat kesadaran kolektif dari seluruh pendaftar OSIS.</p>
                   </div>
                   <div className="w-full h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -888,10 +928,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 2. Sebaran Kategori Nilai Terpopuler */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-4 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Popularitas Kategori Nilai</h3>
-                    <p className="text-[11px] text-slate-500 mb-6">Dimensi kepribadian yang paling sering terpilih di database pendaftar.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Popularitas Kategori Nilai</h3>
+                    <p className="text-[10px] md:text-[11px] text-slate-500 mb-6">Dimensi kepribadian yang paling sering terpilih di database pendaftar.</p>
                   </div>
                   <div className="w-full h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -916,21 +956,21 @@ export default function AdminDashboard() {
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-400 group-hover:opacity-10 transition-opacity pointer-events-none">
                     <Zap className="w-24 h-24" />
                   </div>
-                  <h3 className="text-sm font-bold text-indigo-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-xs md:text-sm font-bold text-indigo-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <Zap className="w-4 h-4" /> Top 5 Nilai Positif Kolektif
                   </h3>
-                  <p className="text-xs text-slate-500 mb-5 font-semibold">Kekuatan pendorong utama yang paling dominan di antara para pelamar.</p>
+                  <p className="text-[11px] text-slate-500 mb-5 font-semibold">Kekuatan pendorong utama yang paling dominan di antara para pelamar.</p>
                   <div className="flex flex-col gap-3">
                     {globalStats.topPositive.length === 0 ? (
                       <div className="text-slate-400 text-xs">Belum ada data pendaftar</div>
                     ) : (
                       globalStats.topPositive.map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between p-3 bg-white border border-indigo-100/30 shadow-sm rounded-xl">
-                          <span className="font-bold text-sm text-slate-800 flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-black flex items-center justify-center">{idx+1}</span>
+                          <span className="font-bold text-xs md:text-sm text-slate-800 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-md bg-indigo-5 border border-indigo-100 text-indigo-600 text-[10px] font-black flex items-center justify-center">{idx+1}</span>
                             {item.word}
                           </span>
-                          <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-md">
+                          <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest px-2 py-0.5 bg-indigo-5 border border-indigo-100 rounded-md">
                             Dipilih {item.count} Kali
                           </span>
                         </div>
@@ -944,21 +984,21 @@ export default function AdminDashboard() {
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-rose-400 group-hover:opacity-10 transition-opacity pointer-events-none">
                     <AlertTriangle className="w-24 h-24" />
                   </div>
-                  <h3 className="text-sm font-bold text-rose-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-xs md:text-sm font-bold text-rose-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <AlertTriangle className="w-4 h-4" /> Top 5 Hambatan Internal Kolektif
                   </h3>
-                  <p className="text-xs text-slate-500 mb-5 font-semibold">Beban kecemasan dan tekanan yang paling sering dirasakan pendaftar OSIS.</p>
+                  <p className="text-[11px] text-slate-500 mb-5 font-semibold">Beban kecemasan dan tekanan yang paling sering dirasakan pendaftar OSIS.</p>
                   <div className="flex flex-col gap-3">
                     {globalStats.topLimiting.length === 0 ? (
                       <div className="text-slate-400 text-xs py-5 text-center">Tidak terdeteksi hambatan internal kolektif yang signifikan</div>
                     ) : (
                       globalStats.topLimiting.map((item, idx) => (
                         <div key={idx} className="flex items-center justify-between p-3 bg-white border border-rose-100/30 shadow-sm rounded-xl">
-                          <span className="font-bold text-sm text-slate-800 flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-rose-50 border border-rose-100 text-rose-600 text-xs font-black flex items-center justify-center">{idx+1}</span>
+                          <span className="font-bold text-xs md:text-sm text-slate-800 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-md bg-rose-5 border border-rose-100 text-rose-600 text-[10px] font-black flex items-center justify-center">{idx+1}</span>
                             {item.word}
                           </span>
-                          <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest px-2.5 py-1 bg-rose-50 border border-rose-100 rounded-md">
+                          <span className="text-[9px] font-black text-rose-600 uppercase tracking-widest px-2 py-0.5 bg-rose-5 border border-rose-100 rounded-md">
                             Terasa {item.count} Kali
                           </span>
                         </div>
@@ -969,74 +1009,48 @@ export default function AdminDashboard() {
 
               </div>
 
-              {/* QUICK INSTRUCTION CARD */}
-              <div className="p-6 bg-white rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-50 rounded-full blur-3xl pointer-events-none"></div>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5 shadow-inner">
-                    <Info className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-base">Butuh detail kandidat tertentu?</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed mt-1 max-w-2xl font-semibold">
-                      Gunakan bilah samping (sidebar) di sebelah kiri untuk mencari, memfilter berdasarkan kelas atau status, dan klik nama kandidat untuk memuat data laporan psikologis mendalam serta daftar pertanyaan wawancara adaptif.
-                    </p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => {
-                    if (candidates.length > 0) {
-                      handleSelectCandidate(candidates[0]);
-                    }
-                  }} 
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-indigo-500/20 shrink-0 flex items-center gap-1.5"
-                >
-                  Pilih Kandidat Pertama <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
             </div>
           )}
 
           {/* ============================================================
-              TAB 2: DETAIL INDIVIDU & INTERACTIVE HOURGLASS (Light Mode)
+              TAB 2: DETAIL INDIVIDU & INTERACTIVE HOURGLASS
               ============================================================ */}
           {activeTab === "report" && activeCandidate && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10 max-w-6xl mx-auto w-full">
               
               {/* GLASSMORPHIC KANDIDAT HEADER */}
-              <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden group">
+              <div className="bg-white p-5 md:p-8 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-600/10">
+                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-2xl md:text-3xl font-black shadow-lg shadow-indigo-600/10">
                     {activeCandidate.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{activeCandidate.name}</h2>
-                    <div className="flex flex-wrap items-center gap-2.5 mt-2">
-                      <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-black rounded-lg border border-indigo-100">{activeCandidate.student_class}</span>
-                      <span className="text-slate-500 text-xs font-semibold flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5" /> Terdaftar pada {new Date(activeCandidate.created_at).toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' })}
+                    <h2 className="text-xl md:text-3xl font-black text-slate-900 tracking-tight leading-tight">{activeCandidate.name}</h2>
+                    <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                      <span className="px-2.5 py-0.5 bg-indigo-5 text-indigo-600 text-[10px] font-black rounded-lg border border-indigo-100">{activeCandidate.student_class}</span>
+                      <span className="text-slate-500 text-[10px] md:text-xs font-semibold flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" /> {new Date(activeCandidate.created_at).toLocaleDateString("id-ID", { day: '2-digit', month: 'short' })}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-2 relative z-10 shrink-0 self-stretch md:self-center">
+                <div className="flex gap-2 relative z-10 shrink-0 w-full md:w-auto self-stretch md:self-center">
                   <button 
                     onClick={() => {
                       setCompareA(activeCandidate.id);
                       setActiveTab("compare");
                     }}
-                    className="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
+                    className="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-2 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    <ArrowLeftRight className="w-4 h-4 text-indigo-600" /> Bandingkan
+                    <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-600" /> Bandingkan
                   </button>
                   <button 
                     onClick={() => window.print()}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md hover:shadow-indigo-500/10 flex items-center justify-center gap-1.5"
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2 px-4 rounded-xl transition-all shadow-md hover:shadow-indigo-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    <FileSpreadsheet className="w-4 h-4" /> Cetak PDF
+                    <FileSpreadsheet className="w-3.5 h-3.5" /> PDF
                   </button>
                 </div>
               </div>
@@ -1045,11 +1059,11 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* 1. Indeks Kesiapan Mental */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div className="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[280px] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Indeks Kesiapan Mental</h3>
-                    <p className="text-slate-500 text-xs leading-relaxed font-semibold">
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Indeks Kesiapan Mental</h3>
+                    <p className="text-slate-500 text-[11px] md:text-xs leading-relaxed font-semibold">
                       Skor holistik mewakili stabilitas psikologis, pengendalian beban stres, dan keselarasan karakter ideal OSIS.
                     </p>
                   </div>
@@ -1059,12 +1073,12 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 2. Tingkat Entropi Budaya */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
+                <div className="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[280px] relative overflow-hidden group">
                   <div className="absolute bottom-0 left-0 p-6 opacity-5 pointer-events-none"><AlertTriangle className="w-20 h-20 text-yellow-500" /></div>
                   
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Tingkat Entropi (Internal Risk)</h3>
-                    <p className="text-slate-500 text-xs leading-relaxed font-semibold">Mengukur persentase rasa ragu, kecemasan, dan tekanan batin.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Tingkat Entropi (Internal Risk)</h3>
+                    <p className="text-slate-500 text-[11px] md:text-xs leading-relaxed font-semibold">Mengukur persentase rasa ragu, kecemasan, dan tekanan batin.</p>
                   </div>
 
                   <div className="my-auto py-6 space-y-4">
@@ -1090,16 +1104,16 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 3. Kesesuaian Karakter (Alignment) */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
+                <div className="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[280px] relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Kesesuaian Karakter (Alignment)</h3>
-                    <p className="text-slate-500 text-xs leading-relaxed font-semibold">Tingkat kepemilikan nilai-nilai positif yang ideal untuk keharmonisan tim OSIS.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Kesesuaian Karakter (Alignment)</h3>
+                    <p className="text-slate-500 text-[11px] md:text-xs leading-relaxed font-semibold">Tingkat kepemilikan nilai-nilai positif yang ideal untuk keharmonisan tim OSIS.</p>
                   </div>
                   
                   <div className="my-auto flex flex-col items-center justify-center py-4">
                     <div className="w-24 h-24 rounded-full border-[6px] border-emerald-100 bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl font-black shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-105">
-                      {activeCandidate.analysis.alignmentScore} <span className="text-xs font-bold text-slate-400 ml-0.5">/ 10</span>
+                      {activeCandidate.analysis.alignmentScore} <span className="text-xs font-bold text-slate-400 ml-0.5">/10</span>
                     </div>
                     <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-3.5 bg-emerald-50 px-2 py-0.5 border border-emerald-100 rounded-md">
                       Poin Keselarasan
@@ -1113,10 +1127,10 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* 1. Radar Chart 10 Dimensi */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Siluet Karakter 10 Dimensi</h3>
-                    <p className="text-[11px] text-slate-500 mb-6">Pemetaan psikometri di 10 aspek nilai kepribadian.</p>
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Siluet Karakter 10 Dimensi</h3>
+                    <p className="text-[10px] md:text-[11px] text-slate-500 mb-6">Pemetaan psikometri di 10 aspek nilai kepribadian.</p>
                   </div>
                   <div className="w-full h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
@@ -1134,7 +1148,7 @@ export default function AdminDashboard() {
                 {/* 2. Balance Index & Perspectives */}
                 <div className="space-y-6 flex flex-col justify-between">
                   {/* Balance Index */}
-                  <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex-1 flex flex-col justify-between relative overflow-hidden">
+                  <div className="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex-1 flex flex-col justify-between relative overflow-hidden">
                     <h3 className="text-xs font-bold text-slate-700 mb-4 uppercase border-b border-slate-100 pb-2.5">Fokus Energi (Balance Index)</h3>
                     <div className="w-full h-[120px] relative">
                       <ResponsiveContainer width="100%" height="100%">
@@ -1154,7 +1168,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Orientasi Kerja */}
-                  <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex-1 flex flex-col justify-between">
+                  <div className="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex-1 flex flex-col justify-between">
                     <h3 className="text-xs font-bold text-slate-700 mb-4 uppercase border-b border-slate-100 pb-2.5">Orientasi Kerja (Perspektif)</h3>
                     <div className="flex justify-between items-end h-[100px] px-2 pt-2">
                       {[
@@ -1184,10 +1198,10 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Visual Hourglass */}
-                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row gap-8 items-center justify-between">
+                <div className="lg:col-span-2 bg-white p-4 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row gap-8 items-center justify-between">
                   <div className="flex-1 space-y-4">
-                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Interactive Barrett Hourglass</h3>
-                    <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
+                    <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Interactive Barrett Hourglass</h3>
+                    <p className="text-[10px] md:text-[11px] text-slate-500 leading-relaxed font-semibold">
                       Matriks 7 tingkat kesadaran Barrett Model. <span className="text-indigo-600 font-bold">Sorot atau klik pada bar tingkat kesadaran</span> untuk membaca arti penting porsi nilai tersebut serta melihat kata-kata yang dipilih kandidat secara real-time.
                     </p>
                     
@@ -1214,7 +1228,7 @@ export default function AdminDashboard() {
                                 return <span className="text-[10px] text-slate-400 font-semibold italic">Tidak ada kata terpilih di level ini</span>;
                               }
                               return words.map((w, idx) => (
-                                <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-md">
+                                <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-5 border border-indigo-100 text-indigo-600 rounded-md">
                                   {w}
                                 </span>
                               ));
@@ -1271,7 +1285,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Level Distribution Sidebar Details */}
-                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                <div className="bg-white p-5 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <h3 className="text-xs font-bold text-slate-700 mb-4 uppercase border-b border-slate-100 pb-2.5">Distribusi Tingkat Kesadaran</h3>
                   <div className="space-y-3.5">
                     {BARRETT_LEVELS.map((item) => {
@@ -1299,14 +1313,14 @@ export default function AdminDashboard() {
                 {/* Positive Values */}
                 <div className="bg-indigo-50/40 border border-indigo-100 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-400 group-hover:scale-105 transition-transform pointer-events-none"><Zap className="w-24 h-24" /></div>
-                  <h3 className="text-sm font-bold text-indigo-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-xs md:text-sm font-bold text-indigo-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <Zap className="w-4 h-4" /> Kekuatan Karakter Utama (Positive Values)
                   </h3>
                   <p className="text-xs text-slate-500 mb-5 font-semibold">Kata-kata positif pilihan kandidat yang mewakili core kekuatan mental.</p>
                   
                   <div className="flex flex-wrap gap-2 relative z-10">
                     {activeCandidate.analysis.topValues.map((w, idx) => (
-                      <span key={idx} className="px-3.5 py-1.5 bg-white border border-indigo-100 text-slate-800 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
+                      <span key={idx} className="px-3.5 py-1.5 bg-white border border-indigo-100 text-slate-800 text-[11px] md:text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
                         <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500" /> {w}
                       </span>
                     ))}
@@ -1316,7 +1330,7 @@ export default function AdminDashboard() {
                 {/* Potentially Limiting Values */}
                 <div className="bg-rose-50/40 border border-rose-100 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-rose-400 group-hover:scale-105 transition-transform pointer-events-none"><AlertTriangle className="w-24 h-24" /></div>
-                  <h3 className="text-sm font-bold text-rose-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-xs md:text-sm font-bold text-rose-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <AlertTriangle className="w-4 h-4" /> Hambatan Potensial (Limiting Values)
                   </h3>
                   <p className="text-xs text-slate-500 mb-5 font-semibold">Indikator kecemasan/tekanan mental internal yang perlu diklarifikasi.</p>
@@ -1324,7 +1338,7 @@ export default function AdminDashboard() {
                   {activeCandidate.analysis.limitingWords.length > 0 ? (
                     <div className="flex flex-wrap gap-2 relative z-10">
                       {activeCandidate.analysis.limitingWords.map((w, idx) => (
-                        <span key={idx} className="px-3.5 py-1.5 bg-white border border-rose-100 text-rose-700 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+                        <span key={idx} className="px-3.5 py-1.5 bg-white border border-rose-100 text-rose-700 text-[11px] md:text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
                           <XCircle className="w-3.5 h-3.5 text-rose-500" /> {w}
                         </span>
                       ))}
@@ -1338,8 +1352,8 @@ export default function AdminDashboard() {
 
               </div>
 
-              {/* AI RECRUITER'S INTERVIEW TOOLKIT (Light Mode) */}
-              <div className="bg-gradient-to-br from-indigo-50/50 via-white to-violet-50/50 border border-indigo-100 p-6 md:p-8 rounded-3xl relative overflow-hidden group shadow-sm">
+              {/* AI RECRUITER'S INTERVIEW TOOLKIT */}
+              <div className="bg-gradient-to-br from-indigo-50/50 via-white to-violet-50/50 border border-indigo-100 p-5 md:p-8 rounded-3xl relative overflow-hidden group shadow-sm">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-50 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <div className="flex items-center gap-3 mb-6">
@@ -1347,8 +1361,8 @@ export default function AdminDashboard() {
                     <Lightbulb className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-slate-900 uppercase tracking-wide">Recruiter's Interview Toolkit</h3>
-                    <p className="text-[11px] text-indigo-600 font-bold uppercase mt-0.5">Panduan Pertanyaan Wawancara Adaptif Navasena</p>
+                    <h3 className="text-xs md:text-base font-black text-slate-900 uppercase tracking-wide">Recruiter's Interview Toolkit</h3>
+                    <p className="text-[10px] md:text-[11px] text-indigo-600 font-bold uppercase mt-0.5">Panduan Pertanyaan Wawancara Adaptif Navasena</p>
                   </div>
                 </div>
 
@@ -1358,7 +1372,7 @@ export default function AdminDashboard() {
 
                 <div className="space-y-4">
                   {interviewQuestions.map((q, idx) => (
-                    <div key={idx} className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-indigo-200 transition-colors shadow-sm space-y-3">
+                    <div key={idx} className="bg-white p-4 md:p-5 rounded-2xl border border-slate-200/80 hover:border-indigo-200 transition-colors shadow-sm space-y-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-md">
                           Indikator: {q.word} ({q.category})
@@ -1383,13 +1397,13 @@ export default function AdminDashboard() {
           )}
 
           {/* ============================================================
-              TAB 3: COMPARE KANDIDAT MODE (Light Mode)
+              TAB 3: COMPARE KANDIDAT MODE
               ============================================================ */}
           {activeTab === "compare" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10">
               
               {/* Dual Selector Card */}
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
+              <div className="bg-white p-5 md:p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
                 
                 {/* Selector A */}
                 <div className="flex-1 w-full space-y-2">
@@ -1430,28 +1444,28 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     {/* Candidate A Card */}
-                    <div className="bg-white p-6 rounded-3xl border border-indigo-100 shadow-sm space-y-6 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-indigo-50 rounded-full blur-3xl"></div>
+                    <div className="bg-white p-5 md:p-6 rounded-3xl border border-indigo-100 shadow-sm space-y-6 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-indigo-55 bg-indigo-50 rounded-full blur-3xl"></div>
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg font-black shrink-0">A</div>
                         <div>
-                          <h3 className="text-lg font-black text-slate-900 truncate max-w-[250px]">{candidateAData.name}</h3>
-                          <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded border border-indigo-100">{candidateAData.student_class}</span>
+                          <h3 className="text-base md:text-lg font-black text-slate-900 truncate max-w-[200px] sm:max-w-[250px]">{candidateAData.name}</h3>
+                          <span className="px-2.5 py-0.5 bg-indigo-5 text-indigo-600 text-[10px] font-black rounded border border-indigo-100">{candidateAData.student_class}</span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
-                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                      <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+                        <div className="text-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
                           <p className="text-[9px] font-black text-slate-400 uppercase">Kesiapan</p>
-                          <p className="text-2xl font-black text-slate-800 mt-1">{candidateAData.analysis.healthScore}</p>
+                          <p className="text-xl md:text-2xl font-black text-slate-800 mt-1">{candidateAData.analysis.healthScore}</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                        <div className="text-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
                           <p className="text-[9px] font-black text-slate-400 uppercase">Entropi</p>
-                          <p className="text-2xl font-black text-rose-500 mt-1">{candidateAData.analysis.entropyScore}%</p>
+                          <p className="text-xl md:text-2xl font-black text-rose-500 mt-1">{candidateAData.analysis.entropyScore}%</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                        <div className="text-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
                           <p className="text-[9px] font-black text-slate-400 uppercase">Kesesuaian</p>
-                          <p className="text-2xl font-black text-emerald-600 mt-1">{candidateAData.analysis.alignmentScore}</p>
+                          <p className="text-xl md:text-2xl font-black text-emerald-600 mt-1">{candidateAData.analysis.alignmentScore}</p>
                         </div>
                       </div>
 
@@ -1459,35 +1473,35 @@ export default function AdminDashboard() {
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kekuatan Utama:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {candidateAData.analysis.topValues.map((w, idx) => (
-                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-md">{w}</span>
+                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-5 border border-indigo-100 text-indigo-600 rounded-md">{w}</span>
                           ))}
                         </div>
                       </div>
                     </div>
 
                     {/* Candidate B Card */}
-                    <div className="bg-white p-6 rounded-3xl border border-rose-100 shadow-sm space-y-6 relative overflow-hidden">
+                    <div className="bg-white p-5 md:p-6 rounded-3xl border border-rose-100 shadow-sm space-y-6 relative overflow-hidden">
                       <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-rose-50 rounded-full blur-3xl"></div>
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center text-rose-600 text-lg font-black shrink-0">B</div>
                         <div>
-                          <h3 className="text-lg font-black text-slate-900 truncate max-w-[250px]">{candidateBData.name}</h3>
-                          <span className="px-2.5 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-black rounded border border-rose-100">{candidateBData.student_class}</span>
+                          <h3 className="text-base md:text-lg font-black text-slate-900 truncate max-w-[200px] sm:max-w-[250px]">{candidateBData.name}</h3>
+                          <span className="px-2.5 py-0.5 bg-rose-5 text-rose-600 text-[10px] font-black rounded border border-rose-100">{candidateBData.student_class}</span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
-                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                      <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100">
+                        <div className="text-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
                           <p className="text-[9px] font-black text-slate-400 uppercase">Kesiapan</p>
-                          <p className="text-2xl font-black text-slate-800 mt-1">{candidateBData.analysis.healthScore}</p>
+                          <p className="text-xl md:text-2xl font-black text-slate-800 mt-1">{candidateBData.analysis.healthScore}</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                        <div className="text-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
                           <p className="text-[9px] font-black text-slate-400 uppercase">Entropi</p>
-                          <p className="text-2xl font-black text-rose-500 mt-1">{candidateBData.analysis.entropyScore}%</p>
+                          <p className="text-xl md:text-2xl font-black text-rose-500 mt-1">{candidateBData.analysis.entropyScore}%</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                        <div className="text-center p-3.5 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
                           <p className="text-[9px] font-black text-slate-400 uppercase">Kesesuaian</p>
-                          <p className="text-2xl font-black text-emerald-600 mt-1">{candidateBData.analysis.alignmentScore}</p>
+                          <p className="text-xl md:text-2xl font-black text-emerald-600 mt-1">{candidateBData.analysis.alignmentScore}</p>
                         </div>
                       </div>
 
@@ -1495,7 +1509,7 @@ export default function AdminDashboard() {
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kekuatan Utama:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {candidateBData.analysis.topValues.map((w, idx) => (
-                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-md">{w}</span>
+                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-rose-5 border border-rose-100 text-rose-600 rounded-md">{w}</span>
                           ))}
                         </div>
                       </div>
@@ -1504,10 +1518,10 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* OVERLAID COMPARATIVE RADAR CHART */}
-                  <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                  <div className="bg-white p-5 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Analisis Benturan Siluet Karakter</h3>
-                      <p className="text-[11px] text-slate-500 mb-6">Visualisasi tumpang tindih dari 10 dimensi psikologis kedua kandidat.</p>
+                      <h3 className="text-xs md:text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Analisis Benturan Siluet Karakter</h3>
+                      <p className="text-[10px] md:text-[11px] text-slate-500 mb-6">Visualisasi tumpang tindih dari 10 dimensi psikologis kedua kandidat.</p>
                     </div>
                     
                     <div className="w-full h-[320px]">
@@ -1536,13 +1550,13 @@ export default function AdminDashboard() {
           )}
 
           {/* ============================================================
-              TAB 4: PANDUAN INTERPRETASI BARRETT MODEL (Light Mode)
+              TAB 4: PANDUAN INTERPRETASI BARRETT MODEL
               ============================================================ */}
           {activeTab === "guide" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10 max-w-4xl mx-auto w-full text-slate-700">
               
-              <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm space-y-4">
-                <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
+              <div className="bg-white p-5 md:p-6 rounded-3xl border border-slate-200/70 shadow-sm space-y-4">
+                <h3 className="text-sm md:text-lg font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
                   <Info className="w-5 h-5 text-indigo-600" /> Mengenal Barrett Model 7 Tingkat Kesadaran
                 </h3>
                 <p className="text-xs leading-relaxed text-slate-500 font-semibold">
