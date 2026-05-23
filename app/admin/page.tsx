@@ -54,13 +54,13 @@ const getCategoryScore = (selectedWordIds: string[], category: string) => {
   return (count / 10) * 100;
 };
 
-// Premium Gauge component
+// Premium Gauge component (Light Mode Style)
 const PremiumGauge = ({ score }: { score: number }) => {
   const rotation = 180 + (score / 100) * 180;
   
   return (
     <div className="relative w-full max-w-[280px] mx-auto aspect-[2/1] overflow-hidden group">
-      <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible drop-shadow-[0_10px_20px_rgba(99,102,241,0.06)]">
+      <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible drop-shadow-[0_10px_20px_rgba(99,102,241,0.08)]">
         <defs>
           <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#f43f5e" />   {/* Red */}
@@ -119,7 +119,6 @@ export default function AdminDashboard() {
     const { data } = await supabase.from("candidates").select("*").order("created_at", { ascending: false });
     if (data) {
       setCandidates(data);
-      // Auto populate comparison states if candidates are available
       if (data.length > 0) {
         setCompareA(data[0].id);
         if (data.length > 1) {
@@ -422,7 +421,7 @@ export default function AdminDashboard() {
       },
       "Waswas": {
         q: "Bagaimana Anda memastikan kepastian atas kesiapan setiap pos kepanitiaan sehingga tidak diliputi rasa khawatir/was-was saat acara berlangsung?",
-        lf: "Penerapan sistem checklist kontrol ketat dan kebiasaan melakukan koordinasi berkala.",
+        lf: "Penerapan sistem checklist kontrol ketat and kebiasaan melakukan koordinasi berkala.",
         cat: "Kecemasan"
       },
       "Pesimis": {
@@ -448,7 +447,6 @@ export default function AdminDashboard() {
       }
     });
 
-    // If candidate has no limiting words, offer high-quality leadership questions based on positive scores
     if (questionsList.length === 0) {
       if (activeCandidate.analysis.topValues.includes("Fokus") || activeCandidate.analysis.topValues.includes("Objektif")) {
         questionsList.push({
@@ -474,7 +472,6 @@ export default function AdminDashboard() {
           lookFor: "Ketegasan objektif yang dibalut kebaikan interpersonal (firm yet compassionate leadership)."
         });
       }
-      // Add a generic fallback question
       questionsList.push({
         word: "Profil Mental Stabil",
         category: "Kesiapan Umum",
@@ -486,53 +483,52 @@ export default function AdminDashboard() {
     return questionsList;
   }, [activeCandidate]);
 
-  // Auto scroll/select when a candidate is clicked
   const handleSelectCandidate = (candidate: Candidate) => {
     setSelectedCandidate(candidate);
     setActiveTab("report");
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row gap-6 font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col md:flex-row gap-6 font-sans">
       
       {/* ============================================================
-          BILAH SAMPING / SIDEBAR (Premium Modern)
+          BILAH SAMPING / SIDEBAR (Premium Light Mode)
           ============================================================ */}
-      <div className="w-full md:w-[380px] bg-slate-950/80 backdrop-blur-xl border-r border-slate-800 flex flex-col h-screen md:sticky top-0 flex-shrink-0 z-30">
+      <div className="w-full md:w-[380px] bg-white border-r border-slate-200 flex flex-col h-screen md:sticky top-0 flex-shrink-0 z-30 shadow-sm">
         
         {/* Header Sidebar */}
-        <div className="p-6 border-b border-slate-800 space-y-4">
+        <div className="p-6 border-b border-slate-100 space-y-4 bg-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20 animate-pulse">
+            <div className="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/10">
               <BrainCircuit className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="font-extrabold text-white text-lg tracking-tight flex items-center gap-1.5">
-                NAVASENA <span className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 bg-indigo-500/20 text-indigo-400 rounded-full">PRO</span>
+              <h2 className="font-extrabold text-slate-900 text-lg tracking-tight flex items-center gap-1.5">
+                NAVASENA <span className="text-[10px] font-bold tracking-widest px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100">PRO</span>
               </h2>
-              <p className="text-slate-400 text-xs font-semibold">Analisis Psikometri OSIS</p>
+              <p className="text-slate-500 text-xs font-semibold">Analisis Psikometri OSIS</p>
             </div>
           </div>
 
           {/* Kolom Pencarian */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input 
               type="text" 
               placeholder="Cari nama atau kelas..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-500 font-medium text-slate-200"
+              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all placeholder:text-slate-400 font-medium text-slate-800"
             />
           </div>
 
           {/* Panel Akordion Filter */}
-          <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-400">
-              <span className="flex items-center gap-1.5"><SlidersHorizontal className="w-3.5 h-3.5 text-indigo-400" /> KONTROL DILAH</span>
+          <div className="bg-slate-50/60 p-3 rounded-xl border border-slate-200/80 space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+              <span className="flex items-center gap-1.5"><SlidersHorizontal className="w-3.5 h-3.5 text-indigo-500" /> KONTROL</span>
               <button 
                 onClick={() => { setFilterClass("all"); setFilterEntropy("all"); setSortBy("newest"); setSearchQuery(""); }} 
-                className="text-[10px] text-slate-500 hover:text-indigo-400 transition-colors uppercase font-black"
+                className="text-[10px] text-slate-400 hover:text-indigo-600 transition-colors uppercase font-black"
               >
                 Reset
               </button>
@@ -540,11 +536,11 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-2 gap-2 mt-2">
               {/* Filter Kelas */}
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Kelas</label>
+                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Kelas</label>
                 <select
                   value={filterClass}
                   onChange={(e) => setFilterClass(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg text-xs p-1.5 text-slate-300 font-medium focus:outline-none focus:border-indigo-500"
+                  className="bg-white border border-slate-200 rounded-lg text-xs p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
                 >
                   <option value="all">Semua Kelas</option>
                   {classesList.map(cls => <option key={cls} value={cls}>{cls}</option>)}
@@ -552,11 +548,11 @@ export default function AdminDashboard() {
               </div>
               {/* Filter Status Entropi */}
               <div className="flex flex-col gap-1">
-                <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Entropi</label>
+                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Entropi</label>
                 <select
                   value={filterEntropy}
                   onChange={(e) => setFilterEntropy(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 rounded-lg text-xs p-1.5 text-slate-300 font-medium focus:outline-none focus:border-indigo-500"
+                  className="bg-white border border-slate-200 rounded-lg text-xs p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
                 >
                   <option value="all">Semua Status</option>
                   <option value="Healthy">Sehat (Healthy)</option>
@@ -567,12 +563,12 @@ export default function AdminDashboard() {
               </div>
             </div>
             {/* Urutan */}
-            <div className="flex flex-col gap-1 mt-1 border-t border-slate-800/60 pt-1.5">
-              <label className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Urutkan</label>
+            <div className="flex flex-col gap-1 mt-1 border-t border-slate-200/60 pt-1.5">
+              <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Urutkan</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-slate-950 border border-slate-800 rounded-lg text-xs p-1.5 text-slate-300 font-medium focus:outline-none focus:border-indigo-500"
+                className="bg-white border border-slate-200 rounded-lg text-xs p-1.5 text-slate-700 font-medium focus:outline-none focus:border-indigo-500"
               >
                 <option value="newest">Terbaru Masuk</option>
                 <option value="name">Nama A - Z</option>
@@ -587,18 +583,18 @@ export default function AdminDashboard() {
             {activeTab !== "overview" && (
               <button 
                 onClick={() => setActiveTab("overview")} 
-                className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-black transition-colors"
+                className="text-indigo-600 hover:text-indigo-500 flex items-center gap-1 font-black transition-colors"
               >
-                <BarChart3 className="w-3 h-3" /> LIHAT STATS GRUP
+                <BarChart3 className="w-3 h-3" /> STATS GRUP
               </button>
             )}
           </div>
         </div>
         
         {/* Daftar Kandidat */}
-        <div className="overflow-y-auto flex-1 p-3 space-y-2 custom-scrollbar bg-slate-950/20">
+        <div className="overflow-y-auto flex-1 p-3 space-y-2 custom-scrollbar bg-slate-50/50">
           {filteredCandidates.length === 0 ? (
-            <div className="text-center py-10 text-slate-600 text-xs font-semibold">
+            <div className="text-center py-10 text-slate-400 text-xs font-semibold">
               Tidak ada kandidat cocok filter
             </div>
           ) : (
@@ -608,16 +604,12 @@ export default function AdminDashboard() {
               // Determine Entropy indicator color
               const entropy = c.analysis.entropyScore;
               let statusColor = "bg-emerald-500 ring-emerald-500/20";
-              let statusLabel = "Healthy";
               if (entropy >= 29) {
                 statusColor = "bg-rose-500 ring-rose-500/20";
-                statusLabel = "Critical";
               } else if (entropy >= 20) {
                 statusColor = "bg-amber-500 ring-amber-500/20";
-                statusLabel = "Significant";
               } else if (entropy >= 14) {
                 statusColor = "bg-yellow-400 ring-yellow-400/20";
-                statusLabel = "Focus";
               }
 
               return (
@@ -626,31 +618,33 @@ export default function AdminDashboard() {
                   onClick={() => handleSelectCandidate(c)}
                   className={`w-full text-left p-4 rounded-xl flex items-center justify-between group transition-all duration-300 relative border overflow-hidden ${
                     isSelected 
-                      ? 'bg-gradient-to-r from-indigo-900 to-indigo-950 border-indigo-700/60 shadow-lg shadow-indigo-950/40 scale-[1.01]' 
-                      : 'bg-slate-900/40 hover:bg-slate-900 border-slate-800/80 hover:border-slate-800'
+                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 border-indigo-600 text-white shadow-md shadow-indigo-600/10 scale-[1.01]' 
+                      : 'bg-white hover:bg-slate-50 border-slate-200/70 shadow-[0_2px_4px_rgba(0,0,0,0.01)]'
                   }`}
                 >
                   <div className="flex items-center gap-3 relative z-10">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors relative shrink-0 ${
                       isSelected 
-                        ? 'bg-indigo-600 text-white' 
-                        : 'bg-slate-800 border border-slate-700 text-slate-400 group-hover:text-white group-hover:bg-slate-700'
+                        ? 'bg-white/20 text-white' 
+                        : 'bg-slate-100 border border-slate-200 text-slate-500 group-hover:text-indigo-600 group-hover:bg-indigo-50'
                     }`}>
                       <User className="w-5 h-5" />
                       {/* Entropy Dot */}
-                      <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-slate-950 ring-4 ${statusColor}`}></span>
+                      <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ring-4 ${statusColor}`}></span>
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5">
                         <p className={`font-bold text-sm tracking-tight transition-colors truncate max-w-[150px] ${
-                          isSelected ? 'text-white' : 'text-slate-200 group-hover:text-indigo-400'
+                          isSelected ? 'text-white' : 'text-slate-800 group-hover:text-indigo-600'
                         }`}>
                           {c.name}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[10px] font-black text-slate-400">{c.student_class}</span>
-                        <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.2 bg-slate-800 text-slate-400 rounded-md border border-slate-700">
+                        <span className={`text-[10px] font-black ${isSelected ? 'text-indigo-200' : 'text-slate-400'}`}>{c.student_class}</span>
+                        <span className={`text-[8px] font-extrabold uppercase px-1.5 py-0.2 rounded border ${
+                          isSelected ? 'bg-indigo-500/20 text-white border-indigo-400/20' : 'bg-slate-50 text-slate-500 border-slate-200/80'
+                        }`}>
                           Ready: {c.analysis.healthScore}
                         </span>
                       </div>
@@ -659,9 +653,9 @@ export default function AdminDashboard() {
                   
                   <div className="flex items-center gap-1.5 relative z-10 shrink-0">
                     {isSelected ? (
-                      <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
+                      <Sparkles className="w-4 h-4 text-white animate-pulse" />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-0.5 transition-all" />
                     )}
                   </div>
                 </button>
@@ -672,20 +666,20 @@ export default function AdminDashboard() {
       </div>
 
       {/* ============================================================
-          KONTEN UTAMA (Professional Tabs)
+          KONTEN UTAMA (Light Mode Dashboard)
           ============================================================ */}
       <div className="flex-1 flex flex-col min-h-screen overflow-x-hidden">
         
         {/* Top Navbar */}
-        <div className="bg-slate-950/40 border-b border-slate-800 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 backdrop-blur-md z-20">
+        <div className="bg-white/80 border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 backdrop-blur-md z-20 shadow-sm">
           <div>
-            <h1 className="text-xl font-black bg-gradient-to-r from-white via-slate-100 to-indigo-400 bg-clip-text text-transparent">
+            <h1 className="text-xl font-black bg-gradient-to-r from-slate-950 via-slate-800 to-indigo-700 bg-clip-text text-transparent">
               {activeTab === "overview" && "Dashboard Analisis Komparatif OSIS"}
               {activeTab === "report" && `Laporan Profil Psikologis: ${activeCandidate?.name || ""}`}
               {activeTab === "compare" && "Kamera Komparasi Kandidat"}
               {activeTab === "guide" && "Panduan Interpretasi Barrett Model"}
             </h1>
-            <p className="text-slate-400 text-xs font-semibold mt-0.5">
+            <p className="text-slate-500 text-xs font-semibold mt-0.5">
               {activeTab === "overview" && "Hasil Pengukuran Karakteristik Kolektif & Tren Pendaftaran"}
               {activeTab === "report" && `Detail Profil Barrett 7 Tingkat Kesadaran Kelas ${activeCandidate?.student_class || ""}`}
               {activeTab === "compare" && "Bandingkan Nilai Karakteristik Dua Kandidat Berdampingan"}
@@ -694,11 +688,11 @@ export default function AdminDashboard() {
           </div>
 
           {/* Tab Button Menu */}
-          <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-xl text-xs font-bold gap-1 self-start sm:self-center">
+          <div className="flex bg-slate-100 border border-slate-200 p-1 rounded-xl text-xs font-bold gap-1 self-start sm:self-center">
             <button 
               onClick={() => setActiveTab("overview")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                activeTab === "overview" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"
+                activeTab === "overview" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" /> Overview
@@ -708,14 +702,14 @@ export default function AdminDashboard() {
               disabled={!activeCandidate}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
                 !activeCandidate ? "opacity-40 cursor-not-allowed" : ""
-              } ${activeTab === "report" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"}`}
+              } ${activeTab === "report" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
             >
               <User className="w-3.5 h-3.5" /> Profil Detail
             </button>
             <button 
               onClick={() => setActiveTab("compare")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                activeTab === "compare" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"
+                activeTab === "compare" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <ArrowLeftRight className="w-3.5 h-3.5" /> Bandingkan
@@ -723,7 +717,7 @@ export default function AdminDashboard() {
             <button 
               onClick={() => setActiveTab("guide")}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all ${
-                activeTab === "guide" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"
+                activeTab === "guide" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <Info className="w-3.5 h-3.5" /> Panduan
@@ -735,7 +729,7 @@ export default function AdminDashboard() {
         <div className="p-6 flex-1">
           
           {/* ============================================================
-              TAB 1: OVERVIEW & KOLEKTIF ANALYTICS
+              TAB 1: OVERVIEW & KOLEKTIF ANALYTICS (Light Mode)
               ============================================================ */}
           {activeTab === "overview" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10">
@@ -744,50 +738,50 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 {/* 1. Total Pelamar */}
-                <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-indigo-400 group-hover:scale-105 transition-transform shrink-0">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
+                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-indigo-600 group-hover:scale-105 transition-transform shrink-0">
                     <Users className="w-5 h-5" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Total Pelamar OSIS</p>
-                  <h3 className="text-3xl font-extrabold text-white mt-1.5">{globalStats.total}</h3>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-emerald-400 font-bold">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Pelamar OSIS</p>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.total}</h3>
+                  <div className="flex items-center gap-1 mt-2 text-[10px] text-emerald-600 font-bold">
                     <TrendingUp className="w-3.5 h-3.5" /> +100% data aktif
                   </div>
                 </div>
 
                 {/* 2. Rerata Mental Kesiapan */}
-                <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-emerald-400 group-hover:scale-105 transition-transform shrink-0">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
+                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-emerald-600 group-hover:scale-105 transition-transform shrink-0">
                     <Activity className="w-5 h-5" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Avg Kesiapan Mental</p>
-                  <h3 className="text-3xl font-extrabold text-white mt-1.5">{globalStats.avgHealth} <span className="text-xs font-bold text-slate-500">/ 100</span></h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Kesiapan Mental</p>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.avgHealth} <span className="text-xs font-bold text-slate-400">/ 100</span></h3>
                   <div className="flex items-center gap-1.5 mt-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span className="text-[10px] text-emerald-400 font-extrabold uppercase">Sangat Siap</span>
+                    <span className="text-[10px] text-emerald-600 font-extrabold uppercase">Sangat Siap</span>
                   </div>
                 </div>
 
                 {/* 3. Rerata Entropi Budaya */}
-                <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-rose-400 group-hover:scale-105 transition-transform shrink-0">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
+                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-rose-500 group-hover:scale-105 transition-transform shrink-0">
                     <AlertTriangle className="w-5 h-5" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Avg Hambatan (Entropi)</p>
-                  <h3 className="text-3xl font-extrabold text-white mt-1.5">{globalStats.avgEntropy}%</h3>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-400 font-semibold">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Hambatan (Entropi)</p>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.avgEntropy}%</h3>
+                  <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-500 font-semibold">
                     Rentang keraguan internal kolektif
                   </div>
                 </div>
 
                 {/* 4. Rerata Alignment OSIS */}
-                <div className="bg-slate-950/60 p-5 rounded-2xl border border-slate-800 relative overflow-hidden group hover:border-slate-700 transition-colors">
-                  <div className="absolute right-3 top-3 p-2.5 bg-slate-900 border border-slate-800 rounded-xl text-amber-400 group-hover:scale-105 transition-transform shrink-0">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.015)] relative overflow-hidden group hover:border-indigo-100 transition-colors">
+                  <div className="absolute right-3 top-3 p-2.5 bg-slate-50 border border-slate-100 rounded-xl text-amber-500 group-hover:scale-105 transition-transform shrink-0">
                     <Award className="w-5 h-5" />
                   </div>
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Kesesuaian Karakter</p>
-                  <h3 className="text-3xl font-extrabold text-white mt-1.5">{globalStats.avgAlignment} <span className="text-xs font-bold text-slate-500">/ 10</span></h3>
-                  <div className="flex items-center gap-1 mt-2 text-[10px] text-amber-400 font-bold">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kesesuaian Karakter</p>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mt-1.5">{globalStats.avgAlignment} <span className="text-xs font-bold text-slate-400">/ 10</span></h3>
+                  <div className="flex items-center gap-1 mt-2 text-[10px] text-amber-500 font-bold">
                     Kecocokan terhadap kultur OSIS
                   </div>
                 </div>
@@ -798,27 +792,27 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* 1. Tren Pendaftaran */}
-                <div className="lg:col-span-2 bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Tren Pendaftaran Kandidat</h3>
-                    <p className="text-[11px] text-slate-400 mb-6">Frekuensi penambahan data baru di setiap harinya.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Tren Pendaftaran Kandidat</h3>
+                    <p className="text-[11px] text-slate-500 mb-6">Frekuensi penambahan data baru di setiap harinya.</p>
                   </div>
                   <div className="w-full h-[220px]">
                     {globalStats.registrationTrend.length === 0 ? (
-                      <div className="h-full flex items-center justify-center text-slate-600 text-xs">Belum ada tren waktu</div>
+                      <div className="h-full flex items-center justify-center text-slate-400 text-xs">Belum ada tren waktu</div>
                     ) : (
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={globalStats.registrationTrend}>
                           <defs>
                             <linearGradient id="colorTrend" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.4}/>
+                              <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.2}/>
                               <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
-                          <XAxis dataKey="date" tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                          <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} allowDecimals={false} />
-                          <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                          <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 10 }} />
+                          <YAxis tick={{ fill: '#64748b', fontSize: 10 }} allowDecimals={false} />
+                          <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', color: '#1e293b' }} />
                           <Area type="monotone" dataKey="Kandidat" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorTrend)" />
                         </AreaChart>
                       </ResponsiveContainer>
@@ -827,14 +821,14 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 2. Distribusi Hambatan (Entropy Donut) */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Distribusi Entropi Kelompok</h3>
-                    <p className="text-[11px] text-slate-400 mb-4">Pengelompokan tingkat beban kecemasan kandidat.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Distribusi Entropi Kelompok</h3>
+                    <p className="text-[11px] text-slate-500 mb-4">Pengelompokan tingkat beban kecemasan kandidat.</p>
                   </div>
                   <div className="w-full h-[180px] relative">
                     {globalStats.entropyGroups.length === 0 ? (
-                      <div className="h-full flex items-center justify-center text-slate-600 text-xs">Tidak ada data status</div>
+                      <div className="h-full flex items-center justify-center text-slate-400 text-xs">Tidak ada data status</div>
                     ) : (
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
@@ -848,19 +842,19 @@ export default function AdminDashboard() {
                             dataKey="value"
                           >
                             {globalStats.entropyGroups.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.fill} stroke="#0f172a" strokeWidth={2} />
+                              <Cell key={`cell-${index}`} fill={entry.fill} stroke="#ffffff" strokeWidth={2} />
                             ))}
                           </Pie>
-                          <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                          <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px' }} />
                         </PieChart>
                       </ResponsiveContainer>
                     )}
                   </div>
-                  <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-[9px] font-black text-slate-400 mt-2 border-t border-slate-800/80 pt-3">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-500"></span> Healthy</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-yellow-400"></span> Focus</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-orange-500"></span> Significant</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-rose-500"></span> Critical</span>
+                  <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-[9px] font-black text-slate-500 mt-2 border-t border-slate-100 pt-3">
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-500"></span> Healthy</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-yellow-400"></span> Focus</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-orange-500"></span> Significant</span>
+                    <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-rose-500"></span> Critical</span>
                   </div>
                 </div>
 
@@ -870,21 +864,20 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 {/* 1. Barrett Levels Average (Collective Conscious) */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Profil Nilai Kolektif (Barrett 7 Levels)</h3>
-                    <p className="text-[11px] text-slate-400 mb-6">Rata-rata tingkat kesadaran kolektif dari seluruh pendaftar OSIS.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Profil Nilai Kolektif (Barrett 7 Levels)</h3>
+                    <p className="text-[11px] text-slate-500 mb-6">Rata-rata tingkat kesadaran kolektif dari seluruh pendaftar OSIS.</p>
                   </div>
                   <div className="w-full h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={globalStats.avgLevels}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
-                        <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                        <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} unit="%" />
-                        <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                        <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 10 }} />
+                        <YAxis tick={{ fill: '#64748b', fontSize: 10 }} unit="%" />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px' }} />
                         <Bar dataKey="RataRata" radius={[6, 6, 0, 0]}>
                           {globalStats.avgLevels.map((entry, idx) => {
-                            // Assign standard levels colors
                             const colors = ["#ef4444", "#f97316", "#eab308", "#84cc16", "#0d9488", "#2563eb", "#9333ea"];
                             return <Cell key={`cell-${idx}`} fill={colors[idx] || "#4f46e5"} />;
                           })}
@@ -895,18 +888,18 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 2. Sebaran Kategori Nilai Terpopuler */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Popularitas Kategori Nilai</h3>
-                    <p className="text-[11px] text-slate-400 mb-6">Dimensi kepribadian yang paling sering terpilih di database pendaftar.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Popularitas Kategori Nilai</h3>
+                    <p className="text-[11px] text-slate-500 mb-6">Dimensi kepribadian yang paling sering terpilih di database pendaftar.</p>
                   </div>
                   <div className="w-full h-[220px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={globalStats.categoryData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" opacity={0.5} />
-                        <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 10 }} />
-                        <YAxis dataKey="category" type="category" tick={{ fill: '#94a3b8', fontSize: 9 }} width={90} />
-                        <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                        <XAxis type="number" tick={{ fill: '#64748b', fontSize: 10 }} />
+                        <YAxis dataKey="category" type="category" tick={{ fill: '#64748b', fontSize: 9 }} width={90} />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px' }} />
                         <Bar dataKey="Frekuensi" fill="#6366f1" radius={[0, 4, 4, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
@@ -919,25 +912,25 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Kolektif Positive Core Values */}
-                <div className="bg-indigo-950/20 border border-indigo-900/60 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="bg-indigo-50/40 border border-indigo-100 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-400 group-hover:opacity-10 transition-opacity pointer-events-none">
                     <Zap className="w-24 h-24" />
                   </div>
-                  <h3 className="text-sm font-bold text-indigo-400 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold text-indigo-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <Zap className="w-4 h-4" /> Top 5 Nilai Positif Kolektif
                   </h3>
-                  <p className="text-xs text-indigo-300/60 mb-5 font-semibold">Kekuatan pendorong utama yang paling dominan di antara para pelamar.</p>
+                  <p className="text-xs text-slate-500 mb-5 font-semibold">Kekuatan pendorong utama yang paling dominan di antara para pelamar.</p>
                   <div className="flex flex-col gap-3">
                     {globalStats.topPositive.length === 0 ? (
-                      <div className="text-slate-600 text-xs">Belum ada data pendaftar</div>
+                      <div className="text-slate-400 text-xs">Belum ada data pendaftar</div>
                     ) : (
                       globalStats.topPositive.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-slate-950/40 border border-indigo-900/20 rounded-xl">
-                          <span className="font-bold text-sm text-slate-100 flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-black flex items-center justify-center">{idx+1}</span>
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white border border-indigo-100/30 shadow-sm rounded-xl">
+                          <span className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-md bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-black flex items-center justify-center">{idx+1}</span>
                             {item.word}
                           </span>
-                          <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
+                          <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-md">
                             Dipilih {item.count} Kali
                           </span>
                         </div>
@@ -947,25 +940,25 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Kolektif Limiting Values */}
-                <div className="bg-rose-950/20 border border-rose-900/60 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="bg-rose-50/40 border border-rose-100 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-rose-400 group-hover:opacity-10 transition-opacity pointer-events-none">
                     <AlertTriangle className="w-24 h-24" />
                   </div>
-                  <h3 className="text-sm font-bold text-rose-400 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold text-rose-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <AlertTriangle className="w-4 h-4" /> Top 5 Hambatan Internal Kolektif
                   </h3>
-                  <p className="text-xs text-rose-300/60 mb-5 font-semibold">Beban kecemasan dan tekanan yang paling sering dirasakan pendaftar OSIS.</p>
+                  <p className="text-xs text-slate-500 mb-5 font-semibold">Beban kecemasan dan tekanan yang paling sering dirasakan pendaftar OSIS.</p>
                   <div className="flex flex-col gap-3">
                     {globalStats.topLimiting.length === 0 ? (
-                      <div className="text-slate-600 text-xs py-5 text-center">Tidak terdeteksi hambatan internal kolektif yang signifikan</div>
+                      <div className="text-slate-400 text-xs py-5 text-center">Tidak terdeteksi hambatan internal kolektif yang signifikan</div>
                     ) : (
                       globalStats.topLimiting.map((item, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-slate-950/40 border border-rose-900/20 rounded-xl">
-                          <span className="font-bold text-sm text-slate-100 flex items-center gap-2">
-                            <span className="w-5 h-5 rounded-md bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-black flex items-center justify-center">{idx+1}</span>
+                        <div key={idx} className="flex items-center justify-between p-3 bg-white border border-rose-100/30 shadow-sm rounded-xl">
+                          <span className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-md bg-rose-50 border border-rose-100 text-rose-600 text-xs font-black flex items-center justify-center">{idx+1}</span>
                             {item.word}
                           </span>
-                          <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest px-2.5 py-1 bg-rose-500/10 border border-rose-500/20 rounded-md">
+                          <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest px-2.5 py-1 bg-rose-50 border border-rose-100 rounded-md">
                             Terasa {item.count} Kali
                           </span>
                         </div>
@@ -977,15 +970,15 @@ export default function AdminDashboard() {
               </div>
 
               {/* QUICK INSTRUCTION CARD */}
-              <div className="p-6 bg-slate-950/60 rounded-3xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div className="p-6 bg-white rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-50 rounded-full blur-3xl pointer-events-none"></div>
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0 mt-0.5">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5 shadow-inner">
                     <Info className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-white text-base">Butuh detail kandidat tertentu?</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed mt-1 max-w-2xl">
+                    <h4 className="font-bold text-slate-900 text-base">Butuh detail kandidat tertentu?</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed mt-1 max-w-2xl font-semibold">
                       Gunakan bilah samping (sidebar) di sebelah kiri untuk mencari, memfilter berdasarkan kelas atau status, dan klik nama kandidat untuk memuat data laporan psikologis mendalam serta daftar pertanyaan wawancara adaptif.
                     </p>
                   </div>
@@ -996,7 +989,7 @@ export default function AdminDashboard() {
                       handleSelectCandidate(candidates[0]);
                     }
                   }} 
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 px-6 rounded-xl transition-all shadow-md shrink-0 flex items-center gap-1.5"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-indigo-500/20 shrink-0 flex items-center gap-1.5"
                 >
                   Pilih Kandidat Pertama <ChevronRight className="w-4 h-4" />
                 </button>
@@ -1006,23 +999,23 @@ export default function AdminDashboard() {
           )}
 
           {/* ============================================================
-              TAB 2: DETAIL INDIVIDU & INTERACTIVE HOURGLASS
+              TAB 2: DETAIL INDIVIDU & INTERACTIVE HOURGLASS (Light Mode)
               ============================================================ */}
           {activeTab === "report" && activeCandidate && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10 max-w-6xl mx-auto w-full">
               
               {/* GLASSMORPHIC KANDIDAT HEADER */}
-              <div className="bg-slate-950/60 p-6 md:p-8 rounded-3xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-1000"></div>
+              <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none"></div>
                 <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-600/25">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-600/10">
                     {activeCandidate.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">{activeCandidate.name}</h2>
+                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{activeCandidate.name}</h2>
                     <div className="flex flex-wrap items-center gap-2.5 mt-2">
-                      <span className="px-3 py-1 bg-indigo-500/25 text-indigo-300 text-xs font-black rounded-lg border border-indigo-500/25">{activeCandidate.student_class}</span>
-                      <span className="text-slate-400 text-xs font-semibold flex items-center gap-1">
+                      <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-black rounded-lg border border-indigo-100">{activeCandidate.student_class}</span>
+                      <span className="text-slate-500 text-xs font-semibold flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" /> Terdaftar pada {new Date(activeCandidate.created_at).toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' })}
                       </span>
                     </div>
@@ -1035,28 +1028,28 @@ export default function AdminDashboard() {
                       setCompareA(activeCandidate.id);
                       setActiveTab("compare");
                     }}
-                    className="flex-1 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-300 font-bold text-xs py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-1.5"
+                    className="flex-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5"
                   >
-                    <ArrowLeftRight className="w-4 h-4 text-indigo-400" /> Bandingkan
+                    <ArrowLeftRight className="w-4 h-4 text-indigo-600" /> Bandingkan
                   </button>
                   <button 
                     onClick={() => window.print()}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-all shadow-md hover:shadow-indigo-500/10 flex items-center justify-center gap-1.5"
                   >
                     <FileSpreadsheet className="w-4 h-4" /> Cetak PDF
                   </button>
                 </div>
               </div>
 
-              {/* THREE MAIN KPI FLOATING ROW */}
+              {/* THREE MAIN KPI ROW */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* 1. Indeks Kesiapan Mental */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1.5 tracking-wide uppercase">Indeks Kesiapan Mental</h3>
-                    <p className="text-slate-400 text-xs leading-relaxed font-semibold">
+                    <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Indeks Kesiapan Mental</h3>
+                    <p className="text-slate-500 text-xs leading-relaxed font-semibold">
                       Skor holistik mewakili stabilitas psikologis, pengendalian beban stres, dan keselarasan karakter ideal OSIS.
                     </p>
                   </div>
@@ -1066,28 +1059,27 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 2. Tingkat Entropi Budaya */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
                   <div className="absolute bottom-0 left-0 p-6 opacity-5 pointer-events-none"><AlertTriangle className="w-20 h-20 text-yellow-500" /></div>
                   
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1.5 tracking-wide uppercase">Tingkat Entropi (Internal Risk)</h3>
-                    <p className="text-slate-400 text-xs leading-relaxed font-semibold">Mengukur persentase rasa ragu, kecemasan, dan tekanan batin.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Tingkat Entropi (Internal Risk)</h3>
+                    <p className="text-slate-500 text-xs leading-relaxed font-semibold">Mengukur persentase rasa ragu, kecemasan, dan tekanan batin.</p>
                   </div>
 
                   <div className="my-auto py-6 space-y-4">
-                    {/* Progress Bar Entropi */}
-                    <div className="flex h-3 w-full rounded-full overflow-hidden bg-slate-900 border border-slate-800 shadow-inner">
+                    <div className="flex h-3 w-full rounded-full overflow-hidden bg-slate-100 shadow-inner">
                       <div className="bg-emerald-500" style={{ width: `${Math.max(0, 100 - activeCandidate.analysis.entropyScore)}%` }}></div>
                       <div className="bg-rose-500" style={{ width: `${activeCandidate.analysis.entropyScore}%` }}></div>
                     </div>
                     
-                    <div className="flex items-center gap-4 bg-slate-950/50 p-4 rounded-xl border border-slate-900 relative z-10">
-                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-lg font-black shrink-0 ${activeCandidate.analysis.entropyLevel.text} bg-slate-900 border border-slate-800`}>
+                    <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 relative z-10 shadow-inner">
+                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-lg font-black shrink-0 ${activeCandidate.analysis.entropyLevel.text} bg-white border border-slate-200/80 shadow-sm`}>
                         {activeCandidate.analysis.entropyScore}%
                       </div>
                       <div>
                         <p className={`text-xs font-black uppercase ${activeCandidate.analysis.entropyLevel.text}`}>{activeCandidate.analysis.entropyLevel.label}</p>
-                        <p className="text-[10px] text-slate-400 font-semibold mt-0.5 leading-relaxed">
+                        <p className="text-[10px] text-slate-500 font-semibold mt-0.5 leading-relaxed">
                           {activeCandidate.analysis.entropyScore < 14 ? "Kandidat sangat stabil secara emosional." 
                           : activeCandidate.analysis.entropyScore < 20 ? "Ada sedikit kekhawatiran terkendali."
                           : "Sedang mengalami tekanan mental yang cukup menonjol."}
@@ -1098,18 +1090,18 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* 3. Kesesuaian Karakter (Alignment) */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between min-h-[300px] relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1.5 tracking-wide uppercase">Kesesuaian Karakter (Alignment)</h3>
-                    <p className="text-slate-400 text-xs leading-relaxed font-semibold">Tingkat kepemilikan nilai-nilai positif yang ideal untuk keharmonisan tim OSIS.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1.5 tracking-wide uppercase">Kesesuaian Karakter (Alignment)</h3>
+                    <p className="text-slate-500 text-xs leading-relaxed font-semibold">Tingkat kepemilikan nilai-nilai positif yang ideal untuk keharmonisan tim OSIS.</p>
                   </div>
                   
                   <div className="my-auto flex flex-col items-center justify-center py-4">
-                    <div className="w-24 h-24 rounded-full border-[6px] border-emerald-500/10 bg-emerald-500/5 text-emerald-400 flex items-center justify-center text-3xl font-black shrink-0 shadow-lg shadow-emerald-500/5 transition-transform duration-500 group-hover:scale-105">
-                      {activeCandidate.analysis.alignmentScore} <span className="text-xs font-bold text-slate-500 ml-0.5">/ 10</span>
+                    <div className="w-24 h-24 rounded-full border-[6px] border-emerald-100 bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl font-black shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-105">
+                      {activeCandidate.analysis.alignmentScore} <span className="text-xs font-bold text-slate-400 ml-0.5">/ 10</span>
                     </div>
-                    <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest mt-3.5 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20 rounded-md">
+                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mt-3.5 bg-emerald-50 px-2 py-0.5 border border-emerald-100 rounded-md">
                       Poin Keselarasan
                     </span>
                   </div>
@@ -1117,44 +1109,44 @@ export default function AdminDashboard() {
 
               </div>
 
-              {/* PROFIL PSIKOLOGIS RADAR & BARRETT BALANCE */}
+              {/* PROFIL RADAR & BALANCE */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* 1. Radar Chart 10 Dimensi */}
-                <div className="lg:col-span-2 bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                   <div>
-                    <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Siluet Karakter 10 Dimensi</h3>
-                    <p className="text-[11px] text-slate-400 mb-6">Pemetaan psikometri di 10 aspek nilai kepribadian.</p>
+                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Siluet Karakter 10 Dimensi</h3>
+                    <p className="text-[11px] text-slate-500 mb-6">Pemetaan psikometri di 10 aspek nilai kepribadian.</p>
                   </div>
                   <div className="w-full h-[280px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart cx="50%" cy="50%" outerRadius="70%" data={individualRadarData}>
-                        <PolarGrid stroke="#334155" opacity={0.6} />
-                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }} />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#475569', fontSize: 8 }} />
-                        <Radar name={activeCandidate.name} dataKey="Kandidat" stroke="#6366f1" fill="#6366f1" fillOpacity={0.25} />
-                        <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                        <PolarGrid stroke="#cbd5e1" opacity={0.8} />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 9, fontWeight: 700 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 8 }} />
+                        <Radar name={activeCandidate.name} dataKey="Kandidat" stroke="#6366f1" fill="#6366f1" fillOpacity={0.15} />
+                        <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '12px' }} />
                       </RadarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                {/* 2. Focus Energi (Balance Index) & Perspectives */}
+                {/* 2. Balance Index & Perspectives */}
                 <div className="space-y-6 flex flex-col justify-between">
                   {/* Balance Index */}
-                  <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex-1 flex flex-col justify-between relative overflow-hidden">
-                    <h3 className="text-xs font-bold text-slate-300 mb-4 uppercase border-b border-slate-800 pb-2.5">Fokus Energi (Balance Index)</h3>
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex-1 flex flex-col justify-between relative overflow-hidden">
+                    <h3 className="text-xs font-bold text-slate-700 mb-4 uppercase border-b border-slate-100 pb-2.5">Fokus Energi (Balance Index)</h3>
                     <div className="w-full h-[120px] relative">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                          <Pie data={balanceData} cx="50%" cy="50%" innerRadius={0} outerRadius={45} dataKey="value" stroke="#0f172a" strokeWidth={2}>
+                          <Pie data={balanceData} cx="50%" cy="50%" innerRadius={0} outerRadius={45} dataKey="value" stroke="#ffffff" strokeWidth={2}>
                             {balanceData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.fill} />)}
                           </Pie>
-                          <RechartsTooltip formatter={(value) => `${value}%`} contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                          <RechartsTooltip formatter={(value) => `${value}%`} contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px' }} />
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
-                    <div className="flex justify-center gap-3 text-[9px] font-black text-slate-400 mt-2 border-t border-slate-800/80 pt-2.5">
+                    <div className="flex justify-center gap-3 text-[9px] font-black text-slate-500 mt-2 border-t border-slate-100 pt-2.5">
                       <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-[#f97316]"></span> Foundation</div>
                       <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-[#84cc16]"></span> Evolution</div>
                       <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-[#4f46e5]"></span> Impact</div>
@@ -1162,23 +1154,23 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Orientasi Kerja */}
-                  <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex-1 flex flex-col justify-between">
-                    <h3 className="text-xs font-bold text-slate-300 mb-4 uppercase border-b border-slate-800 pb-2.5">Orientasi Kerja (Perspektif)</h3>
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex-1 flex flex-col justify-between">
+                    <h3 className="text-xs font-bold text-slate-700 mb-4 uppercase border-b border-slate-100 pb-2.5">Orientasi Kerja (Perspektif)</h3>
                     <div className="flex justify-between items-end h-[100px] px-2 pt-2">
                       {[
-                        { key: 'Process', label: 'Proses', icon: <Activity className="w-3.5 h-3.5 text-emerald-400"/> },
-                        { key: 'People', label: 'Relasi', icon: <Heart className="w-3.5 h-3.5 text-rose-400"/> },
-                        { key: 'Purpose', label: 'Target', icon: <Target className="w-3.5 h-3.5 text-amber-400"/> }
+                        { key: 'Process', label: 'Proses', icon: <Activity className="w-3.5 h-3.5 text-emerald-500"/> },
+                        { key: 'People', label: 'Relasi', icon: <Heart className="w-3.5 h-3.5 text-rose-500"/> },
+                        { key: 'Purpose', label: 'Target', icon: <Target className="w-3.5 h-3.5 text-amber-500"/> }
                       ].map((item) => {
                         const val = activeCandidate.analysis.perspectives[item.key.toLowerCase() as keyof typeof activeCandidate.analysis.perspectives];
                         return (
                           <div key={item.key} className="flex flex-col items-center w-12 group">
-                            <div className="w-full bg-slate-900 border border-slate-800 rounded-t-lg flex-1 relative flex items-end overflow-hidden">
-                              <div className="w-full bg-indigo-600 transition-all duration-700 ease-out shadow-[0_-4px_6px_-1px_rgba(99,102,241,0.2)]" style={{ height: `${val}%` }}></div>
+                            <div className="w-full bg-slate-50 border border-slate-200 rounded-t-lg flex-1 relative flex items-end overflow-hidden">
+                              <div className="w-full bg-indigo-600 transition-all duration-700 ease-out shadow-[0_-4px_6px_-1px_rgba(99,102,241,0.1)]" style={{ height: `${val}%` }}></div>
                             </div>
-                            <div className="flex items-center gap-1 mt-2.5 text-slate-500">{item.icon}</div>
-                            <p className="text-[10px] font-extrabold text-slate-300 mt-1">{item.label}</p>
-                            <p className="text-[9px] text-indigo-400 font-bold">{val}%</p>
+                            <div className="flex items-center gap-1 mt-2.5 text-slate-400">{item.icon}</div>
+                            <p className="text-[10px] font-extrabold text-slate-700 mt-1">{item.label}</p>
+                            <p className="text-[9px] text-indigo-600 font-bold">{val}%</p>
                           </div>
                         );
                       })}
@@ -1192,27 +1184,25 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* Visual Hourglass */}
-                <div className="lg:col-span-2 bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col md:flex-row gap-8 items-center justify-between">
+                <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col md:flex-row gap-8 items-center justify-between">
                   <div className="flex-1 space-y-4">
-                    <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Interactive Barrett Hourglass</h3>
-                    <p className="text-[11px] text-slate-400 leading-relaxed font-semibold">
-                      Matriks 7 tingkat kesadaran Barrett Model. <span className="text-indigo-400 font-bold">Sorot atau klik pada bar tingkat kesadaran</span> untuk membaca arti penting porsi nilai tersebut serta melihat kata-kata yang dipilih kandidat secara real-time.
+                    <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Interactive Barrett Hourglass</h3>
+                    <p className="text-[11px] text-slate-500 leading-relaxed font-semibold">
+                      Matriks 7 tingkat kesadaran Barrett Model. <span className="text-indigo-600 font-bold">Sorot atau klik pada bar tingkat kesadaran</span> untuk membaca arti penting porsi nilai tersebut serta melihat kata-kata yang dipilih kandidat secara real-time.
                     </p>
                     
-                    {/* Deskripsi level aktif jika ada */}
                     {activeHourglassLvl !== null ? (
-                      <div className="p-4 bg-slate-900 border border-indigo-800/40 rounded-xl space-y-2 animate-in fade-in zoom-in duration-200">
+                      <div className="p-4 bg-slate-50 border border-indigo-100 rounded-xl space-y-2 animate-in fade-in zoom-in duration-200 shadow-inner">
                         <div className="flex items-center gap-2">
                           <span className={`w-3 h-3 rounded-full ${BARRETT_LEVELS.find(l => l.lvl === activeHourglassLvl)?.color}`}></span>
-                          <h4 className="font-extrabold text-white text-xs">{BARRETT_LEVELS.find(l => l.lvl === activeHourglassLvl)?.name}</h4>
+                          <h4 className="font-extrabold text-slate-800 text-xs">{BARRETT_LEVELS.find(l => l.lvl === activeHourglassLvl)?.name}</h4>
                         </div>
-                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
                           {BARRETT_LEVELS.find(l => l.lvl === activeHourglassLvl)?.desc}
                         </p>
                         
-                        {/* Kata terpilih di level ini */}
-                        <div className="border-t border-slate-800/80 pt-2 mt-2">
-                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Pilihan Kata Kandidat:</p>
+                        <div className="border-t border-slate-200 pt-2 mt-2">
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Pilihan Kata Kandidat:</p>
                           <div className="flex flex-wrap gap-1.5 mt-1">
                             {(() => {
                               const words = activeCandidate.selected_word_ids
@@ -1221,10 +1211,10 @@ export default function AdminDashboard() {
                                 .map(w => w?.word);
                               
                               if (words.length === 0) {
-                                return <span className="text-[10px] text-slate-600 font-semibold italic">Tidak ada kata terpilih di level ini</span>;
+                                return <span className="text-[10px] text-slate-400 font-semibold italic">Tidak ada kata terpilih di level ini</span>;
                               }
                               return words.map((w, idx) => (
-                                <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 rounded-md">
+                                <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-md">
                                   {w}
                                 </span>
                               ));
@@ -1233,7 +1223,7 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ) : (
-                      <div className="p-5 bg-slate-900/40 border border-slate-800 border-dashed rounded-xl flex items-center justify-center text-center text-slate-500 text-xs font-semibold">
+                      <div className="p-5 bg-slate-50 border border-slate-200 border-dashed rounded-xl flex items-center justify-center text-center text-slate-400 text-xs font-semibold">
                         Arahkan kursor atau klik salah satu level untuk menampilkan info interpretasi detail.
                       </div>
                     )}
@@ -1241,7 +1231,7 @@ export default function AdminDashboard() {
 
                   {/* SVG Hourglass */}
                   <div className="w-[180px] flex-shrink-0 relative py-4 flex flex-col gap-2 items-center">
-                    <svg viewBox="0 0 100 240" className="absolute inset-0 w-full h-full z-0 opacity-10">
+                    <svg viewBox="0 0 100 240" className="absolute inset-0 w-full h-full z-0 opacity-5 pointer-events-none">
                       <polygon points="15,0 85,0 70,120 85,240 15,240 30,120" fill="#38bdf8" />
                     </svg>
                     
@@ -1259,21 +1249,19 @@ export default function AdminDashboard() {
                           onClick={() => setActiveHourglassLvl(item.lvl)}
                           className={`w-full flex items-center justify-between px-3 py-1.5 rounded-lg border text-left relative z-10 transition-all ${
                             isHovered 
-                              ? 'bg-slate-900 border-slate-700 shadow-md shadow-slate-950' 
-                              : 'bg-slate-950/40 border-slate-900/60'
+                              ? 'bg-slate-50 border-slate-300 shadow-sm shadow-slate-100' 
+                              : 'bg-white border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.005)]'
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <div className={`w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-md ${item.color} ${
-                              hasWords ? "ring-2 ring-white/20 animate-pulse" : "opacity-60"
+                            <div className={`w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center shadow-sm ${item.color} ${
+                              hasWords ? "ring-2 ring-indigo-500/10 animate-pulse" : "opacity-55"
                             }`}>
                               {item.lvl}
                             </div>
-                            <span className="text-[10px] font-extrabold text-slate-300">Level {item.lvl}</span>
+                            <span className="text-[10px] font-extrabold text-slate-700">Level {item.lvl}</span>
                           </div>
-                          
-                          {/* Persentase */}
-                          <span className={`text-[10px] font-black ${val > 0 ? item.text : "text-slate-600"}`}>
+                          <span className={`text-[10px] font-black ${val > 0 ? item.text : "text-slate-400"}`}>
                             {val}%
                           </span>
                         </button>
@@ -1283,18 +1271,18 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Level Distribution Sidebar Details */}
-                <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
-                  <h3 className="text-xs font-bold text-slate-300 mb-4 uppercase border-b border-slate-800 pb-2.5">Distribusi Tingkat Kesadaran</h3>
+                <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
+                  <h3 className="text-xs font-bold text-slate-700 mb-4 uppercase border-b border-slate-100 pb-2.5">Distribusi Tingkat Kesadaran</h3>
                   <div className="space-y-3.5">
                     {BARRETT_LEVELS.map((item) => {
                       const val = activeCandidate.analysis.levels[item.lvl as keyof typeof activeCandidate.analysis.levels] || 0;
                       return (
                         <div key={item.lvl} className="space-y-1">
-                          <div className="flex items-center justify-between text-[10px] font-black text-slate-400">
+                          <div className="flex items-center justify-between text-[10px] font-black text-slate-500">
                             <span className="truncate max-w-[130px]">{item.name}</span>
                             <span>{val}%</span>
                           </div>
-                          <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
+                          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
                             <div className={`h-full rounded-full ${item.color}`} style={{ width: `${val}%` }}></div>
                           </div>
                         </div>
@@ -1305,44 +1293,44 @@ export default function AdminDashboard() {
 
               </div>
 
-              {/* WORD CLOUD PILLS GRID */}
+              {/* WORD PILLS GRID */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Positive Values */}
-                <div className="bg-indigo-950/15 border border-indigo-900/40 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="bg-indigo-50/40 border border-indigo-100 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-400 group-hover:scale-105 transition-transform pointer-events-none"><Zap className="w-24 h-24" /></div>
-                  <h3 className="text-sm font-bold text-indigo-400 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold text-indigo-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <Zap className="w-4 h-4" /> Kekuatan Karakter Utama (Positive Values)
                   </h3>
-                  <p className="text-xs text-indigo-300/50 mb-5 font-semibold">Kata-kata positif pilihan kandidat yang mewakili core kekuatan mental.</p>
+                  <p className="text-xs text-slate-500 mb-5 font-semibold">Kata-kata positif pilihan kandidat yang mewakili core kekuatan mental.</p>
                   
                   <div className="flex flex-wrap gap-2 relative z-10">
                     {activeCandidate.analysis.topValues.map((w, idx) => (
-                      <span key={idx} className="px-3.5 py-1.5 bg-slate-900/80 hover:bg-slate-900 border border-indigo-900/30 text-slate-100 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" /> {w}
+                      <span key={idx} className="px-3.5 py-1.5 bg-white border border-indigo-100 text-slate-800 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-500" /> {w}
                       </span>
                     ))}
                   </div>
                 </div>
 
                 {/* Potentially Limiting Values */}
-                <div className="bg-rose-950/15 border border-rose-900/40 p-6 rounded-3xl relative overflow-hidden group">
+                <div className="bg-rose-50/40 border border-rose-100 p-6 rounded-3xl relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-8 opacity-5 text-rose-400 group-hover:scale-105 transition-transform pointer-events-none"><AlertTriangle className="w-24 h-24" /></div>
-                  <h3 className="text-sm font-bold text-rose-400 mb-1 tracking-wide uppercase flex items-center gap-1.5">
+                  <h3 className="text-sm font-bold text-rose-600 mb-1 tracking-wide uppercase flex items-center gap-1.5">
                     <AlertTriangle className="w-4 h-4" /> Hambatan Potensial (Limiting Values)
                   </h3>
-                  <p className="text-xs text-rose-300/50 mb-5 font-semibold">Indikator kecemasan/tekanan mental internal yang perlu diklarifikasi.</p>
+                  <p className="text-xs text-slate-500 mb-5 font-semibold">Indikator kecemasan/tekanan mental internal yang perlu diklarifikasi.</p>
                   
                   {activeCandidate.analysis.limitingWords.length > 0 ? (
                     <div className="flex flex-wrap gap-2 relative z-10">
                       {activeCandidate.analysis.limitingWords.map((w, idx) => (
-                        <span key={idx} className="px-3.5 py-1.5 bg-slate-900/80 border border-rose-900/30 text-rose-300 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
-                          <XCircle className="w-3.5 h-3.5 text-rose-400" /> {w}
+                        <span key={idx} className="px-3.5 py-1.5 bg-white border border-rose-100 text-rose-700 text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5">
+                          <XCircle className="w-3.5 h-3.5 text-rose-500" /> {w}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <div className="w-full p-5 bg-emerald-500/10 text-emerald-400 rounded-xl text-xs text-center font-bold border border-emerald-500/20 relative z-10">
+                    <div className="w-full p-5 bg-emerald-50 text-emerald-600 rounded-xl text-xs text-center font-bold border border-emerald-100 relative z-10 shadow-sm">
                       Luar Biasa! Tidak terdeteksi hambatan internal psikologis.
                     </div>
                   )}
@@ -1350,43 +1338,41 @@ export default function AdminDashboard() {
 
               </div>
 
-              {/* ============================================================
-                  AI RECRUITER'S INTERVIEW TOOLKIT (Adaptif & Premium)
-                  ============================================================ */}
-              <div className="bg-gradient-to-br from-indigo-950/30 via-slate-900/60 to-violet-950/30 border border-indigo-500/20 p-6 md:p-8 rounded-3xl relative overflow-hidden group">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              {/* AI RECRUITER'S INTERVIEW TOOLKIT (Light Mode) */}
+              <div className="bg-gradient-to-br from-indigo-50/50 via-white to-violet-50/50 border border-indigo-100 p-6 md:p-8 rounded-3xl relative overflow-hidden group shadow-sm">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-indigo-50 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
                     <Lightbulb className="w-5 h-5 animate-pulse" />
                   </div>
                   <div>
-                    <h3 className="text-base font-black text-white uppercase tracking-wide">Recruiter's Interview Toolkit</h3>
-                    <p className="text-[11px] text-indigo-300/80 font-bold uppercase mt-0.5">Panduan Pertanyaan Wawancara Adaptif Navasena</p>
+                    <h3 className="text-base font-black text-slate-900 uppercase tracking-wide">Recruiter's Interview Toolkit</h3>
+                    <p className="text-[11px] text-indigo-600 font-bold uppercase mt-0.5">Panduan Pertanyaan Wawancara Adaptif Navasena</p>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed mb-6 font-semibold">
-                  Sistem mendeteksi <span className="text-indigo-400 font-bold">{activeCandidate.analysis.limitingWords.length} kata pembatas</span> dari pilihan kandidat. Gunakan daftar pertanyaan perilaku adaptif di bawah ini saat wawancara mendalam untuk mengklarifikasi kematangan mental kandidat:
+                <p className="text-xs text-slate-500 leading-relaxed mb-6 font-semibold">
+                  Sistem mendeteksi <span className="text-indigo-600 font-bold">{activeCandidate.analysis.limitingWords.length} kata pembatas</span> dari pilihan kandidat. Gunakan daftar pertanyaan perilaku adaptif di bawah ini saat wawancara mendalam untuk mengklarifikasi kematangan mental kandidat:
                 </p>
 
                 <div className="space-y-4">
                   {interviewQuestions.map((q, idx) => (
-                    <div key={idx} className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800/80 hover:border-indigo-900/40 transition-colors space-y-3">
+                    <div key={idx} className="bg-white p-5 rounded-2xl border border-slate-200/80 hover:border-indigo-200 transition-colors shadow-sm space-y-3">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest px-2.5 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-md">
+                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-md">
                           Indikator: {q.word} ({q.category})
                         </span>
-                        <span className="text-[10px] text-slate-500 font-bold">PERTANYAAN {idx+1}</span>
+                        <span className="text-[10px] text-slate-400 font-bold">PERTANYAAN {idx+1}</span>
                       </div>
                       
-                      <h4 className="font-extrabold text-sm text-slate-100 leading-relaxed border-l-2 border-indigo-500 pl-3">
+                      <h4 className="font-extrabold text-sm text-slate-800 leading-relaxed border-l-2 border-indigo-600 pl-3">
                         "{q.question}"
                       </h4>
 
-                      <div className="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 text-[11px] leading-relaxed">
-                        <strong className="text-emerald-400 font-bold uppercase tracking-wider block mb-1">Panduan Jawaban Ideal:</strong>
-                        <span className="text-slate-400 font-semibold">{q.lookFor}</span>
+                      <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-[11px] leading-relaxed">
+                        <strong className="text-emerald-600 font-bold uppercase tracking-wider block mb-1">Panduan Jawaban Ideal:</strong>
+                        <span className="text-slate-500 font-semibold">{q.lookFor}</span>
                       </div>
                     </div>
                   ))}
@@ -1397,38 +1383,38 @@ export default function AdminDashboard() {
           )}
 
           {/* ============================================================
-              TAB 3: COMPARE KANDIDAT MODE (Side by Side)
+              TAB 3: COMPARE KANDIDAT MODE (Light Mode)
               ============================================================ */}
           {activeTab === "compare" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10">
               
               {/* Dual Selector Card */}
-              <div className="bg-slate-950/60 p-6 rounded-3xl border border-slate-800 flex flex-col md:flex-row gap-6 items-center justify-between">
+              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
                 
                 {/* Selector A */}
                 <div className="flex-1 w-full space-y-2">
-                  <label className="text-[10px] font-black text-indigo-400 uppercase tracking-widest block">Kandidat Pembanding A</label>
+                  <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest block">Kandidat Pembanding A</label>
                   <select
                     value={compareA}
                     onChange={(e) => setCompareA(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
                   >
                     {analyzedCandidates.map(c => <option key={c.id} value={c.id}>{c.name} ({c.student_class})</option>)}
                   </select>
                 </div>
 
                 {/* VS Divider */}
-                <div className="w-12 h-12 rounded-2xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 font-black flex items-center justify-center shrink-0 shadow-inner">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 font-black flex items-center justify-center shrink-0 shadow-inner">
                   VS
                 </div>
 
                 {/* Selector B */}
                 <div className="flex-1 w-full space-y-2">
-                  <label className="text-[10px] font-black text-rose-400 uppercase tracking-widest block">Kandidat Pembanding B</label>
+                  <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest block">Kandidat Pembanding B</label>
                   <select
                     value={compareB}
                     onChange={(e) => setCompareB(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 font-bold focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 font-bold focus:outline-none focus:ring-2 focus:ring-rose-500/10"
                   >
                     {analyzedCandidates.map(c => <option key={c.id} value={c.id}>{c.name} ({c.student_class})</option>)}
                   </select>
@@ -1444,72 +1430,72 @@ export default function AdminDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     
                     {/* Candidate A Card */}
-                    <div className="bg-slate-950/40 p-6 rounded-3xl border border-indigo-900/30 space-y-6 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                    <div className="bg-white p-6 rounded-3xl border border-indigo-100 shadow-sm space-y-6 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-indigo-50 rounded-full blur-3xl"></div>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-indigo-600/25 border border-indigo-500/40 rounded-xl flex items-center justify-center text-indigo-300 text-lg font-black shrink-0">A</div>
+                        <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-lg font-black shrink-0">A</div>
                         <div>
-                          <h3 className="text-lg font-black text-white truncate max-w-[250px]">{candidateAData.name}</h3>
-                          <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 text-[10px] font-black rounded border border-indigo-500/25">{candidateAData.student_class}</span>
+                          <h3 className="text-lg font-black text-slate-900 truncate max-w-[250px]">{candidateAData.name}</h3>
+                          <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] font-black rounded border border-indigo-100">{candidateAData.student_class}</span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/80">
-                        <div className="text-center p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                          <p className="text-[9px] font-black text-slate-500 uppercase">Kesiapan</p>
-                          <p className="text-2xl font-black text-white mt-1">{candidateAData.analysis.healthScore}</p>
+                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                          <p className="text-[9px] font-black text-slate-400 uppercase">Kesiapan</p>
+                          <p className="text-2xl font-black text-slate-800 mt-1">{candidateAData.analysis.healthScore}</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                          <p className="text-[9px] font-black text-slate-500 uppercase">Entropi</p>
-                          <p className="text-2xl font-black text-rose-400 mt-1">{candidateAData.analysis.entropyScore}%</p>
+                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                          <p className="text-[9px] font-black text-slate-400 uppercase">Entropi</p>
+                          <p className="text-2xl font-black text-rose-500 mt-1">{candidateAData.analysis.entropyScore}%</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                          <p className="text-[9px] font-black text-slate-500 uppercase">Kesesuaian</p>
-                          <p className="text-2xl font-black text-emerald-400 mt-1">{candidateAData.analysis.alignmentScore}</p>
+                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                          <p className="text-[9px] font-black text-slate-400 uppercase">Kesesuaian</p>
+                          <p className="text-2xl font-black text-emerald-600 mt-1">{candidateAData.analysis.alignmentScore}</p>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Kekuatan Utama:</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kekuatan Utama:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {candidateAData.analysis.topValues.map((w, idx) => (
-                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 rounded-md">{w}</span>
+                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-md">{w}</span>
                           ))}
                         </div>
                       </div>
                     </div>
 
                     {/* Candidate B Card */}
-                    <div className="bg-slate-950/40 p-6 rounded-3xl border border-rose-900/30 space-y-6 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-rose-500/5 rounded-full blur-3xl"></div>
+                    <div className="bg-white p-6 rounded-3xl border border-rose-100 shadow-sm space-y-6 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-40 h-40 bg-rose-50 rounded-full blur-3xl"></div>
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-rose-600/25 border border-rose-500/40 rounded-xl flex items-center justify-center text-rose-300 text-lg font-black shrink-0">B</div>
+                        <div className="w-12 h-12 bg-rose-50 border border-rose-100 rounded-xl flex items-center justify-center text-rose-600 text-lg font-black shrink-0">B</div>
                         <div>
-                          <h3 className="text-lg font-black text-white truncate max-w-[250px]">{candidateBData.name}</h3>
-                          <span className="px-2.5 py-0.5 bg-rose-500/10 text-rose-400 text-[10px] font-black rounded border border-rose-500/25">{candidateBData.student_class}</span>
+                          <h3 className="text-lg font-black text-slate-900 truncate max-w-[250px]">{candidateBData.name}</h3>
+                          <span className="px-2.5 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-black rounded border border-rose-100">{candidateBData.student_class}</span>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/80">
-                        <div className="text-center p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                          <p className="text-[9px] font-black text-slate-500 uppercase">Kesiapan</p>
-                          <p className="text-2xl font-black text-white mt-1">{candidateBData.analysis.healthScore}</p>
+                      <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                          <p className="text-[9px] font-black text-slate-400 uppercase">Kesiapan</p>
+                          <p className="text-2xl font-black text-slate-800 mt-1">{candidateBData.analysis.healthScore}</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                          <p className="text-[9px] font-black text-slate-500 uppercase">Entropi</p>
-                          <p className="text-2xl font-black text-rose-400 mt-1">{candidateBData.analysis.entropyScore}%</p>
+                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                          <p className="text-[9px] font-black text-slate-400 uppercase">Entropi</p>
+                          <p className="text-2xl font-black text-rose-500 mt-1">{candidateBData.analysis.entropyScore}%</p>
                         </div>
-                        <div className="text-center p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                          <p className="text-[9px] font-black text-slate-500 uppercase">Kesesuaian</p>
-                          <p className="text-2xl font-black text-emerald-400 mt-1">{candidateBData.analysis.alignmentScore}</p>
+                        <div className="text-center p-3 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
+                          <p className="text-[9px] font-black text-slate-400 uppercase">Kesesuaian</p>
+                          <p className="text-2xl font-black text-emerald-600 mt-1">{candidateBData.analysis.alignmentScore}</p>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Kekuatan Utama:</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kekuatan Utama:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {candidateBData.analysis.topValues.map((w, idx) => (
-                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-md">{w}</span>
+                            <span key={idx} className="text-[10px] font-bold px-2 py-0.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-md">{w}</span>
                           ))}
                         </div>
                       </div>
@@ -1518,22 +1504,22 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* OVERLAID COMPARATIVE RADAR CHART */}
-                  <div className="bg-slate-950/40 p-6 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between">
                     <div>
-                      <h3 className="text-sm font-bold text-white mb-1 tracking-wide uppercase">Analisis Benturan Siluet Karakter</h3>
-                      <p className="text-[11px] text-slate-400 mb-6">Visualisasi tumpang tindih dari 10 dimensi psikologis kedua kandidat.</p>
+                      <h3 className="text-sm font-bold text-slate-900 mb-1 tracking-wide uppercase">Analisis Benturan Siluet Karakter</h3>
+                      <p className="text-[11px] text-slate-500 mb-6">Visualisasi tumpang tindih dari 10 dimensi psikologis kedua kandidat.</p>
                     </div>
                     
                     <div className="w-full h-[320px]">
                       <ResponsiveContainer width="100%" height="100%">
                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarComparisonData}>
-                          <PolarGrid stroke="#334155" opacity={0.6} />
-                          <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 9, fontWeight: 700 }} />
-                          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#475569', fontSize: 8 }} />
-                          <Radar name={candidateAData.name} dataKey={candidateAData.name} stroke="#6366f1" fill="#6366f1" fillOpacity={0.25} />
-                          <Radar name={candidateBData.name} dataKey={candidateBData.name} stroke="#f43f5e" fill="#f43f5e" fillOpacity={0.25} />
+                          <PolarGrid stroke="#cbd5e1" opacity={0.8} />
+                          <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 9, fontWeight: 700 }} />
+                          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#94a3b8', fontSize: 8 }} />
+                          <Radar name={candidateAData.name} dataKey={candidateAData.name} stroke="#6366f1" fill="#6366f1" fillOpacity={0.15} />
+                          <Radar name={candidateBData.name} dataKey={candidateBData.name} stroke="#f43f5e" fill="#f43f5e" fillOpacity={0.15} />
                           <Legend wrapperStyle={{ paddingTop: 10 }} />
-                          <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '12px' }} />
+                          <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px' }} />
                         </RadarChart>
                       </ResponsiveContainer>
                     </div>
@@ -1541,7 +1527,7 @@ export default function AdminDashboard() {
 
                 </div>
               ) : (
-                <div className="text-center py-10 text-slate-500 text-xs font-semibold">
+                <div className="text-center py-10 text-slate-400 text-xs font-semibold">
                   Silakan pilih pendaftar OSIS pada kolom drop-down pembanding di atas.
                 </div>
               )}
@@ -1550,30 +1536,30 @@ export default function AdminDashboard() {
           )}
 
           {/* ============================================================
-              TAB 4: PANDUAN INTERPRETASI BARRETT MODEL
+              TAB 4: PANDUAN INTERPRETASI BARRETT MODEL (Light Mode)
               ============================================================ */}
           {activeTab === "guide" && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10 max-w-4xl mx-auto w-full text-slate-300">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500 pb-10 max-w-4xl mx-auto w-full text-slate-700">
               
-              <div className="bg-slate-950/60 p-6 rounded-3xl border border-slate-800 space-y-4">
-                <h3 className="text-lg font-black text-white uppercase tracking-wider flex items-center gap-2">
-                  <Info className="w-5 h-5 text-indigo-400" /> Mengenal Barrett Model 7 Tingkat Kesadaran
+              <div className="bg-white p-6 rounded-3xl border border-slate-200/70 shadow-sm space-y-4">
+                <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider flex items-center gap-2 border-b border-slate-100 pb-3">
+                  <Info className="w-5 h-5 text-indigo-600" /> Mengenal Barrett Model 7 Tingkat Kesadaran
                 </h3>
-                <p className="text-xs leading-relaxed text-slate-400 font-semibold">
+                <p className="text-xs leading-relaxed text-slate-500 font-semibold">
                   Barrett Model membagi fokus kesadaran psikologis pendaftar menjadi 7 tingkat. Dalam perekrutan pengurus OSIS, pemahaman atas sebaran ini membantu kita menempatkan kandidat pada posisi kepengurusan yang tepat (*Right Man in the Right Place*):
                 </p>
 
-                <div className="space-y-4 pt-4 border-t border-slate-800/80">
+                <div className="space-y-4 pt-2">
                   {BARRETT_LEVELS.map((item) => (
-                    <div key={item.lvl} className="flex gap-4 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl">
-                      <div className={`w-10 h-10 rounded-xl text-white text-base font-black flex items-center justify-center shrink-0 ${item.color} shadow-md`}>
+                    <div key={item.lvl} className="flex gap-4 p-4 bg-slate-50 border border-slate-100 shadow-inner rounded-2xl">
+                      <div className={`w-10 h-10 rounded-xl text-white text-base font-black flex items-center justify-center shrink-0 ${item.color} shadow-sm`}>
                         {item.lvl}
                       </div>
                       <div className="space-y-1.5">
-                        <h4 className="font-extrabold text-sm text-slate-100">{item.name}</h4>
-                        <p className="text-xs text-slate-400 leading-relaxed font-semibold">{item.desc}</p>
+                        <h4 className="font-extrabold text-sm text-slate-800">{item.name}</h4>
+                        <p className="text-xs text-slate-500 leading-relaxed font-semibold">{item.desc}</p>
                         
-                        <div className="text-[10px] text-indigo-300 font-extrabold bg-indigo-500/10 px-2 py-0.5 border border-indigo-500/20 rounded inline-block">
+                        <div className="text-[10px] text-indigo-600 font-extrabold bg-indigo-50 px-2 py-0.5 border border-indigo-100 rounded inline-block shadow-sm">
                           {item.lvl === 7 && "Saran Posisi: Ketua OSIS / Pembuat Visi / Humas Hubungan Luar"}
                           {item.lvl === 6 && "Saran Posisi: Wakil Ketua / Kordinator Lintas Sekbid / Hubungan Internal"}
                           {item.lvl === 5 && "Saran Posisi: Sekbid Keagamaan / Pengawas Kode Etik / MPK"}
